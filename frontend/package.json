@@ -1,0 +1,11 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Placeholder frontend scaffold for sagor.accountsbazar.com",
+  "scripts": {
+    "dev": "echo \"Frontend scaffold not bootstrapped yet\"",
+    "build": "echo \"Frontend scaffold not bootstrapped yet\"",
+    "test": "echo \"No frontend tests configured yet\""
+  }
+}

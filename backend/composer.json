@@ -1,0 +1,13 @@
+{
+  "name": "mrkk1122/accountsbazar-backend",
+  "description": "Placeholder backend scaffold for sagor.accountsbazar.com",
+  "type": "project",
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
