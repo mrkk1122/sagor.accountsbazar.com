@@ -39,7 +39,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     <title>প্রোফাইল | <?= htmlspecialchars(SITE_NAME) ?></title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css?v=20260512-8">
+    <link rel="stylesheet" href="css/style.css?v=20260512-9">
     <style>
         .profile-page{padding:40px 0 80px;}
         .profile-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:24px;}

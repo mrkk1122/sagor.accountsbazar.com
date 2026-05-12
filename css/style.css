@@ -182,7 +182,14 @@ section { padding: 90px 0; }
     padding: 80px 0;
 }
 
-.hero-inner { max-width: 720px; }
+.hero-inner {
+    max-width: 1120px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 32px;
+    align-items: center;
+}
 
 .badge {
     display: inline-block;
@@ -213,6 +220,46 @@ section { padding: 90px 0; }
 .hero-text strong { color: var(--gold); }
 
 .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.hero-visual {
+    position: relative;
+    justify-self: end;
+    width: min(460px, 100%);
+    animation: heroFloat 4s ease-in-out infinite;
+}
+
+.hero-photo-frame {
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(212,175,55,.34);
+    box-shadow: 0 18px 34px rgba(0,0,0,.35);
+}
+
+.hero-photo-frame img {
+    width: 100%;
+    height: clamp(280px, 45vw, 460px);
+    object-fit: cover;
+    transform: scale(1.03);
+}
+
+.hero-float-badge {
+    position: absolute;
+    left: -14px;
+    bottom: 20px;
+    background: rgba(13,17,23,.9);
+    border: 1px solid rgba(212,175,55,.42);
+    color: var(--gold);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .6px;
+}
+
+@keyframes heroFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
 
 /* ---------- About / Stats ---------- */
 #about { background: var(--dark2); }
@@ -757,12 +804,14 @@ section { padding: 90px 0; }
     .about-grid   { grid-template-columns: 1fr; }
     .footer-inner { grid-template-columns: 1fr 1fr; }
     .footer-brand { grid-column: 1 / -1; }
+    .hero-inner { grid-template-columns: 1fr; max-width: 760px; }
+    .hero-visual { justify-self: start; width: min(520px, 100%); }
 }
 
 @media (max-width: 768px) {
     section { padding: 60px 0; }
 
-    body { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+    body { padding-bottom: calc(106px + env(safe-area-inset-bottom)); }
 
     .hamburger { display: block; }
 
@@ -799,9 +848,9 @@ section { padding: 90px 0; }
         z-index: 1002;
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 8px;
-        padding: 10px;
-        border-radius: 16px;
+        gap: 9px;
+        padding: 12px;
+        border-radius: 18px;
         border: 1px solid rgba(212,175,55,.25);
         background: rgba(13,17,23,.94);
         backdrop-filter: blur(10px);
@@ -818,21 +867,21 @@ section { padding: 90px 0; }
         font-size: 12px;
         font-weight: 700;
         text-align: center;
-        padding: 11px 6px;
+        padding: 13px 6px;
         border-radius: 10px;
         border: 1px solid transparent;
         line-height: 1.2;
     }
 
     .mobile-fixed-bar .mfb-icon {
-        font-size: 22px;
+        font-size: 26px;
         line-height: 1;
         font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
     }
 
     .mobile-fixed-bar .mfb-avatar {
-        width: 26px;
-        height: 26px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         background: rgba(212,175,55,.18);
         border: 1px solid rgba(212,175,55,.42);
@@ -840,7 +889,7 @@ section { padding: 90px 0; }
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 13px;
+        font-size: 15px;
         font-weight: 700;
         line-height: 1;
         text-transform: uppercase;
@@ -859,7 +908,7 @@ section { padding: 90px 0; }
     }
 
     #back-top {
-        bottom: calc(102px + env(safe-area-inset-bottom));
+        bottom: calc(118px + env(safe-area-inset-bottom));
         right: 16px;
     }
 }
@@ -869,6 +918,8 @@ section { padding: 90px 0; }
     .logo { font-size: 18px; }
     .hero-text h1 { font-size: 32px; }
     .hero-text p { font-size: 15px; }
+    .hero-visual { width: 100%; }
+    .hero-photo-frame img { height: 280px; }
     .hero-btns { flex-direction: column; }
     .btn { width: 100%; }
     .stats-row { flex-direction: column; }
@@ -882,16 +933,16 @@ section { padding: 90px 0; }
     }
 
     .mobile-fixed-bar a {
-        padding: 9px 4px;
+        padding: 10px 4px;
         font-size: 10px;
     }
 
-    .mobile-fixed-bar .mfb-icon { font-size: 19px; }
+    .mobile-fixed-bar .mfb-icon { font-size: 22px; }
 
     .mobile-fixed-bar .mfb-avatar {
-        width: 23px;
-        height: 23px;
-        font-size: 12px;
+        width: 25px;
+        height: 25px;
+        font-size: 13px;
     }
 
     .booking-time-grid { grid-template-columns: 1fr; }

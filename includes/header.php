@@ -13,7 +13,7 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
     <meta name="description" content="প্রফেশনাল ফটোগ্রাফি সার্ভিস - বিয়ে, জন্মদিন, আউটডোর শুট ও সকল ইভেন্টের অ্যাডভান্স বুকিং নিন।">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css?v=20260512-8">
+    <link rel="stylesheet" href="css/style.css?v=20260512-9">
 </head>
 <body>
 
@@ -52,6 +52,12 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
                     <a href="/#contact" class="btn btn-outline">যোগাযোগ করুন</a>
                     <button id="pwa-install-btn" class="btn btn-outline" style="display:none;align-items:center;gap:6px;">📱 অ্যাপ ইনস্টল করুন</button>
                 </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-photo-frame">
+                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=900&q=80" alt="Camera man with professional camera" loading="eager">
+                </div>
+                <span class="hero-float-badge">Live Shoot</span>
             </div>
         </div>
     </div>
