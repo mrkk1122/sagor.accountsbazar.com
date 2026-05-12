@@ -9,7 +9,7 @@
             <a href="/#about">পরিচিতি</a>
             <a href="/#services">সার্ভিস</a>
             <a href="/booking.php">বুকিং</a>
-            <a href="/#contact">যোগাযোগ</a>
+            <a href="/contact.php">যোগাযোগ</a>
             <a href="/profile.php">প্রোফাইল</a>
         </div>
         <div class="footer-contact">
@@ -28,7 +28,7 @@
     <a href="/#top"><span class="mfb-icon" aria-hidden="true">🏠</span><span class="mfb-label">হোম</span></a>
     <a href="/#services"><span class="mfb-icon" aria-hidden="true">🛠</span><span class="mfb-label">সার্ভিস</span></a>
     <a href="/booking.php"><span class="mfb-icon" aria-hidden="true">📅</span><span class="mfb-label">বুকিং</span></a>
-    <a href="/#contact"><span class="mfb-icon" aria-hidden="true">☎</span><span class="mfb-label">যোগাযোগ</span></a>
+    <a href="/contact.php"><span class="mfb-icon" aria-hidden="true">☎</span><span class="mfb-label">যোগাযোগ</span></a>
     <?php if ($__user): ?>
         <a href="/profile.php"><span class="mfb-avatar" aria-hidden="true"><?= htmlspecialchars(mb_substr($__user['name'], 0, 1)) ?></span><span class="mfb-label">প্রোফাইল</span></a>
     <?php else: ?>
@@ -36,6 +36,6 @@
     <?php endif; ?>
 </nav>
 
-<script src="js/main.js?v=20260512-8"></script>
+<script src="js/main.js?v=20260512-10"></script>
 </body>
 </html>

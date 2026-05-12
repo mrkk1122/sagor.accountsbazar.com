@@ -39,7 +39,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     <title>প্রোফাইল | <?= htmlspecialchars(SITE_NAME) ?></title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css?v=20260512-9">
+    <link rel="stylesheet" href="css/style.css?v=20260512-10">
     <style>
         .profile-page{padding:40px 0 80px;}
         .profile-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:24px;}
@@ -202,5 +202,15 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     </div>
 
 </div>
+
+<nav class="mobile-fixed-bar" aria-label="Mobile quick navigation">
+    <a href="/"><span class="mfb-icon" aria-hidden="true">🏠</span><span class="mfb-label">হোম</span></a>
+    <a href="/#services"><span class="mfb-icon" aria-hidden="true">🛠</span><span class="mfb-label">সার্ভিস</span></a>
+    <a href="/booking.php"><span class="mfb-icon" aria-hidden="true">📅</span><span class="mfb-label">বুকিং</span></a>
+    <a href="/contact.php"><span class="mfb-icon" aria-hidden="true">☎</span><span class="mfb-label">যোগাযোগ</span></a>
+    <a href="/profile.php"><span class="mfb-avatar" aria-hidden="true"><?= htmlspecialchars(mb_substr($user['name'], 0, 1)) ?></span><span class="mfb-label">প্রোফাইল</span></a>
+</nav>
+
+<script src="js/main.js?v=20260512-10"></script>
 </body>
 </html>

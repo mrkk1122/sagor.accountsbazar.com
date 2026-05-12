@@ -13,7 +13,7 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
     <meta name="description" content="প্রফেশনাল ফটোগ্রাফি সার্ভিস - বিয়ে, জন্মদিন, আউটডোর শুট ও সকল ইভেন্টের অ্যাডভান্স বুকিং নিন।">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css?v=20260512-9">
+    <link rel="stylesheet" href="css/style.css?v=20260512-10">
 </head>
 <body>
 
@@ -22,12 +22,11 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
     <div class="navbar-wrap">
         <div class="container nav-inner">
             <a href="/" class="logo"><?= PHOTOGRAPHER_NAME ?> <span>Photography</span></a>
-            <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
             <nav id="main-nav">
                 <a href="/#about">পরিচিতি</a>
                 <a href="/#services">সার্ভিস</a>
                 <a href="/booking.php">বুকিং</a>
-                <a href="/#contact">যোগাযোগ</a>
+                <a href="/contact.php">যোগাযোগ</a>
                 <?php if ($__user): ?>
                     <a href="/profile.php" class="main-nav-profile"><span class="nav-avatar"><?= htmlspecialchars(mb_substr($__user['name'], 0, 1)) ?></span> প্রোফাইল</a>
                     <a href="/logout.php">লগআউট</a>
