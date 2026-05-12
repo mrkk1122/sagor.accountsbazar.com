@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/auth.php';
+
 /**
  * Booking form handler
  * Returns ['success' => bool, 'message' => string]

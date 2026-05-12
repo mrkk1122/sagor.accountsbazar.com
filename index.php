@@ -3,7 +3,6 @@ require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/booking-handler.php';
 
 $booking = handle_booking();
-$__user  = current_user(); // already set via header.php include chain
 ?>
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
