@@ -78,38 +78,6 @@ require_once __DIR__ . '/includes/config.php';
     </div>
 </section>
 
-<!-- ===== CONTACT CARDS ===== -->
-<section style="padding:40px 0 90px">
-    <div class="container">
-        <div class="section-title">
-            <span class="label">Contact</span>
-            <h2>যোগাযোগের মাধ্যম</h2>
-        </div>
-        <div class="contact-grid">
-            <div class="contact-card">
-                <div class="c-icon">📞</div>
-                <h4>ফোন কল</h4>
-                <p><?= PHONE ?></p>
-            </div>
-            <div class="contact-card">
-                <div class="c-icon">💬</div>
-                <h4>WhatsApp</h4>
-                <p><?= WHATSAPP ?></p>
-            </div>
-            <div class="contact-card">
-                <div class="c-icon">📧</div>
-                <h4>ইমেইল</h4>
-                <p><?= EMAIL ?></p>
-            </div>
-            <div class="contact-card">
-                <div class="c-icon">📍</div>
-                <h4>লোকেশন</h4>
-                <p><?= LOCATION ?></p>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Back to top -->
 <button id="back-top" aria-label="Back to top">↑</button>
 

@@ -816,22 +816,11 @@ section { padding: 90px 0; }
     .hamburger { display: none; }
 
     #main-nav {
-        position: static;
-        background: transparent;
-        flex-direction: row;
-        align-items: center;
-        gap: 12px;
-        padding: 0;
-        transform: none;
-        transition: none;
-        border-bottom: none;
-        overflow-x: auto;
-        white-space: nowrap;
-        max-width: 62%;
+        display: none !important;
     }
 
     #main-nav.open { transform: none; }
-    #main-nav a { padding: 7px 0; font-size: 13px; }
+    #main-nav a { padding: 0; font-size: 0; }
 
     .form-row { grid-template-columns: 1fr; }
 
