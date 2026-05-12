@@ -661,6 +661,11 @@ section { padding: 90px 0; }
     font-size: 13px;
 }
 
+/* ---------- Mobile fixed bar ---------- */
+.mobile-fixed-bar {
+    display: none;
+}
+
 /* ---------- Back to top ---------- */
 #back-top {
     position: fixed;
@@ -703,6 +708,8 @@ section { padding: 90px 0; }
 @media (max-width: 768px) {
     section { padding: 60px 0; }
 
+    body { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+
     .hamburger { display: block; }
 
     #main-nav {
@@ -729,6 +736,46 @@ section { padding: 90px 0; }
 
     .pricing-card { padding: 34px 24px; }
     .price-display .amount { font-size: 52px; }
+
+    .mobile-fixed-bar {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+        z-index: 1002;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 6px;
+        padding: 8px;
+        border-radius: 14px;
+        border: 1px solid rgba(212,175,55,.25);
+        background: rgba(13,17,23,.94);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 26px rgba(0,0,0,.35);
+    }
+
+    .mobile-fixed-bar a {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-align: center;
+        padding: 9px 6px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        line-height: 1.2;
+    }
+
+    .mobile-fixed-bar a:hover,
+    .mobile-fixed-bar a:focus-visible {
+        color: var(--gold);
+        border-color: rgba(212,175,55,.3);
+        background: rgba(212,175,55,.09);
+    }
+
+    #back-top {
+        bottom: calc(84px + env(safe-area-inset-bottom));
+        right: 16px;
+    }
 }
 
 @media (max-width: 480px) {

@@ -24,6 +24,18 @@
     </div>
 </footer>
 
+<nav class="mobile-fixed-bar" aria-label="Mobile quick navigation">
+    <a href="/#top">হোম</a>
+    <a href="/#services">সার্ভিস</a>
+    <a href="/#booking">বুকিং</a>
+    <a href="/#contact">যোগাযোগ</a>
+    <?php if ($__user): ?>
+        <a href="/profile.php">প্রোফাইল</a>
+    <?php else: ?>
+        <a href="/login.php">লগইন</a>
+    <?php endif; ?>
+</nav>
+
 <script src="js/main.js"></script>
 </body>
 </html>
