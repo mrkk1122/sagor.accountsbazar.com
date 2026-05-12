@@ -1,25 +1,11 @@
-# Sagor Photography — Apache config
-
-# PHP version — uncomment ONE line that matches your cPanel PHP handler
-# (check cPanel → MultiPHP Manager for the correct handler name)
-#AddHandler application/x-httpd-php74 .php
-#AddHandler application/x-httpd-php80 .php
-#AddHandler application/x-httpd-php81 .php
-#AddHandler application/x-httpd-php82 .php
-#AddHandler application/x-httpd-php83 .php
+# Sagor Photography — Apache / LiteSpeed config
 
 # Deny directory listing
 Options -Indexes
 
-# Protect bookings log
+# Protect log files
 <FilesMatch "\.log$">
-    <IfVersion >= 2.4>
-        Require all denied
-    </IfVersion>
-    <IfVersion < 2.4>
-        Order allow,deny
-        Deny from all
-    </IfVersion>
+    Require all denied
 </FilesMatch>
 
 # Protect includes directory
