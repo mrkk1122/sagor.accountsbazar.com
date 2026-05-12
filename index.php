@@ -1,440 +1,301 @@
 <?php
-$success = false;
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $success = true;
-}
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/booking-handler.php';
+
+$booking = handle_booking();
 ?>
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sagor Photography | Professional Booking</title>
-    <style>
-        :root {
-            --primary: #111827;
-            --secondary: #d4af37;
-            --light: #f9fafb;
-            --muted: #6b7280;
-            --card: #ffffff;
-            --accent: #1f2937;
-        }
+<?php require_once __DIR__ . '/includes/header.php'; ?>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        body {
-            background: #f3f4f6;
-            color: #111827;
-            line-height: 1.6;
-        }
-
-        .container {
-            width: min(1100px, 92%);
-            margin: auto;
-        }
-
-        header {
-            background: linear-gradient(rgba(17,24,39,.75), rgba(17,24,39,.78)), url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1400&q=80') center/cover;
-            color: white;
-            padding: 90px 0;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 70px;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        .logo span {
-            color: var(--secondary);
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 18px;
-            font-size: 15px;
-        }
-
-        .hero {
-            max-width: 700px;
-        }
-
-        .hero h1 {
-            font-size: 48px;
-            line-height: 1.15;
-            margin-bottom: 18px;
-        }
-
-        .hero p {
-            font-size: 18px;
-            margin-bottom: 26px;
-            color: #e5e7eb;
-        }
-
-        .btn {
-            display: inline-block;
-            background: var(--secondary);
-            color: #111827;
-            padding: 14px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #fff;
-            color: #fff;
-            margin-left: 12px;
-        }
-
-        section {
-            padding: 70px 0;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .section-title h2 {
-            font-size: 34px;
-            margin-bottom: 10px;
-        }
-
-        .section-title p {
-            color: var(--muted);
-            max-width: 700px;
-            margin: auto;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 22px;
-        }
-
-        .card {
-            background: var(--card);
-            padding: 24px;
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.06);
-        }
-
-        .card h3 {
-            margin-bottom: 12px;
-            color: var(--accent);
-        }
-
-        .price-box {
-            text-align: center;
-            background: #111827;
-            color: white;
-            padding: 34px 24px;
-            border-radius: 16px;
-        }
-
-        .price-box .price {
-            font-size: 42px;
-            color: var(--secondary);
-            font-weight: 700;
-            margin: 14px 0;
-        }
-
-        .schedule {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-        }
-
-        .schedule .day {
-            background: white;
-            padding: 18px;
-            border-left: 4px solid var(--secondary);
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,.05);
-        }
-
-        .booking-wrap {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 28px;
-            align-items: start;
-        }
-
-        form {
-            background: white;
-            padding: 24px;
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.05);
-        }
-
-        .field {
-            margin-bottom: 16px;
-        }
-
-        .field label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
-
-        .field input,
-        .field select,
-        .field textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            outline: none;
-        }
-
-        .field textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .info-box {
-            background: #111827;
-            color: white;
-            padding: 26px;
-            border-radius: 14px;
-        }
-
-        .info-box h3 {
-            margin-bottom: 14px;
-            color: var(--secondary);
-        }
-
-        .info-box p,
-        .info-box li {
-            color: #e5e7eb;
-        }
-
-        .info-box ul {
-            padding-left: 20px;
-            margin: 12px 0;
-        }
-
-        .success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #86efac;
-            padding: 14px 16px;
-            border-radius: 10px;
-            margin-bottom: 18px;
-        }
-
-        footer {
-            background: #0f172a;
-            color: #cbd5e1;
-            text-align: center;
-            padding: 24px 0;
-        }
-
-        @media (max-width: 850px) {
-            .booking-wrap {
-                grid-template-columns: 1fr;
-            }
-
-            nav {
-                flex-direction: column;
-                gap: 14px;
-            }
-
-            .nav-links {
-                text-align: center;
-            }
-
-            .nav-links a {
-                margin: 0 8px;
-            }
-
-            .hero h1 {
-                font-size: 36px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo">Sagor <span>Photography</span></div>
-                <div class="nav-links">
-                    <a href="#about">About</a>
-                    <a href="#pricing">Pricing</a>
-                    <a href="#schedule">Schedule</a>
-                    <a href="#booking">Booking</a>
-                    <a href="#contact">Contact</a>
-                </div>
-            </nav>
-
-            <div class="hero">
-                <h1>প্রফেশনাল ফটোগ্রাফি সার্ভিস ও অ্যাডভান্স বুকিং</h1>
-                <p>আমি আপনার বিশেষ মুহূর্তগুলোকে সুন্দরভাবে ক্যামেরাবন্দি করি। এখন আপনি সহজেই অনলাইন থেকে আমাকে hire করতে পারবেন, বুকিং দিতে পারবেন এবং কাজের সময়সূচি দেখতে পারবেন।</p>
-                <a href="#booking" class="btn">এখনই বুকিং করুন</a>
-                <a href="#pricing" class="btn btn-outline">দাম দেখুন</a>
-            </div>
+<!-- ===== ABOUT ===== -->
+<section id="about">
+    <div class="container">
+        <div class="section-title">
+            <span class="label">About Me</span>
+            <h2>আমার সম্পর্কে জানুন</h2>
+            <p>আমি একজন প্রফেশনাল ফটোগ্রাফার যিনি বিয়ে, জন্মদিন, পারিবারিক অনুষ্ঠান ও আউটডোর শুটের জন্য কাস্টমাইজড সার্ভিস দিই।</p>
         </div>
-    </header>
 
-    <section id="about">
-        <div class="container">
-            <div class="section-title">
-                <h2>আমার সম্পর্কে</h2>
-                <p>আমি একজন প্রফেশনাল ফটোগ্রাফার। বিয়ে, জন্মদিন, পারিবারিক অনুষ্ঠান, আউটডোর ফটোশুট এবং ব্যক্তিগত প্রজেক্টের জন্য কাস্টমাইজড ফটোগ্রাফি সার্ভিস দিয়ে থাকি।</p>
+        <div class="about-grid">
+            <div class="about-img">
+                <img src="https://images.unsplash.com/photo-1452378174528-3090a4bba7b2?auto=format&fit=crop&w=800&q=80"
+                     alt="Photographer at work" loading="lazy">
+                <div class="exp-badge">✦ Professional Photographer</div>
             </div>
-            <div class="cards">
-                <div class="card">
-                    <h3>ইভেন্ট ফটোগ্রাফি</h3>
-                    <p>বিয়ে, গায়ে হলুদ, জন্মদিন, কর্পোরেট ইভেন্টসহ বিভিন্ন অনুষ্ঠানের প্রফেশনাল কভারেজ।</p>
-                </div>
-                <div class="card">
-                    <h3>পোর্ট্রেট শুট</h3>
-                    <p>ব্যক্তিগত, কাপল, ফ্যামিলি এবং সোশ্যাল মিডিয়া পোর্ট্রেট শুট সেবা।</p>
-                </div>
-                <div class="card">
-                    <h3>অ্যাডভান্স বুকিং</h3>
-                    <p>আগেই তারিখ, সময় এবং শুটের ধরন নির্ধারণ করে সহজে বুকিং সম্পন্ন করুন।</p>
+
+            <div class="about-content">
+                <h2>প্রতিটি মুহূর্ত যেন একটি শিল্প</h2>
+                <p>আমি আপনার বিশেষ মুহূর্তগুলোকে সুন্দর ও পেশাদারভাবে ক্যামেরাবন্দি করি। প্রতিটি ছবিতে আমি নিশ্চিত করি সেরা আলো, কম্পোজিশন এবং অনুভূতি।</p>
+                <p>সাশ্রয়ী মূল্যে সর্বোচ্চ মানের ফটোগ্রাফি সার্ভিস — যেখানে প্রতিটি ছবির মূল্য মাত্র <strong class="text-gold">৳<?= PRICE_PER_PHOTO ?></strong> টাকা।</p>
+
+                <div class="stats-row">
+                    <div class="stat"><span class="num">৫০০+</span><span class="lbl">সন্তুষ্ট ক্লাইন্ট</span></div>
+                    <div class="stat"><span class="num">১০০০+</span><span class="lbl">ইভেন্ট কভার</span></div>
+                    <div class="stat"><span class="num">৳<?= PRICE_PER_PHOTO ?></span><span class="lbl">প্রতি ছবি</span></div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section id="pricing">
-        <div class="container">
-            <div class="section-title">
-                <h2>প্রাইসিং</h2>
-                <p>স্বচ্ছ ও সহজ মূল্য তালিকা যাতে কাস্টমাররা আগেই খরচ সম্পর্কে জানতে পারেন।</p>
+<!-- ===== SERVICES ===== -->
+<section id="services">
+    <div class="container">
+        <div class="section-title">
+            <span class="label">Services</span>
+            <h2>আমার সার্ভিসমূহ</h2>
+            <p>বিভিন্ন ধরনের ফটোগ্রাফি সার্ভিস যা আপনার প্রয়োজন ও বাজেট অনুযায়ী কাস্টমাইজ করা যাবে।</p>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">💍</div>
+                <h3>বিয়ের ফটোগ্রাফি</h3>
+                <p>বিয়ে, গায়ে হলুদ ও রিসেপশনের সম্পূর্ণ প্রফেশনাল কভারেজ — প্রতিটি মুহূর্ত চিরস্মরণীয় করে রাখুন।</p>
             </div>
-            <div class="price-box">
-                <h3>প্রতি ছবির মূল্য</h3>
-                <div class="price">৳ ১০</div>
-                <p>প্রতি ছবির জন্য নির্ধারিত মূল্য ১০ টাকা। বড় কাজের ক্ষেত্রে আলাদা প্যাকেজ ও কাস্টম অফার দেওয়া যাবে।</p>
+            <div class="service-card">
+                <div class="service-icon">🎂</div>
+                <h3>জন্মদিনের ফটোগ্রাফি</h3>
+                <p>শিশু থেকে প্রাপ্তবয়স্ক — সবার জন্য আনন্দের জন্মদিন উদযাপনের স্মরণীয় ছবি।</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🌿</div>
+                <h3>আউটডোর ফটোশুট</h3>
+                <p>পার্ক, নদীর ধার, ছাদ বা যেকোনো আউটডোর লোকেশনে ক্রিয়েটিভ ফটোশুট।</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🖼️</div>
+                <h3>পোর্ট্রেট ফটোগ্রাফি</h3>
+                <p>ব্যক্তিগত, কাপল বা পারিবারিক পোর্ট্রেট — সোশ্যাল মিডিয়া বা স্মৃতির জন্য নিখুঁত শট।</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🎪</div>
+                <h3>ইভেন্ট কভারেজ</h3>
+                <p>কর্পোরেট, সাংস্কৃতিক বা যেকোনো বড় অনুষ্ঠানের সম্পূর্ণ ফটো কভারেজ।</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">👨‍👩‍👧</div>
+                <h3>ফ্যামিলি ফটোশুট</h3>
+                <p>পরিবারের সুন্দর মুহূর্তগুলো একসাথে ক্যামেরায় ধরে রাখুন — ঘরে বা বাইরে।</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section id="schedule">
-        <div class="container">
-            <div class="section-title">
-                <h2>কাজের সময়সূচি</h2>
-                <p>নিচে সপ্তাহের দিন এবং কাজের সময় দেওয়া হলো। প্রয়োজনে বিশেষ দিনে আলাদা বুকিং নেওয়া হবে।</p>
-            </div>
-            <div class="cards" style="margin-bottom: 24px;">
-                <div class="card">
-                    <h3>দৈনিক সময়</h3>
-                    <p><strong>সকাল ৯:০০ টা</strong> থেকে <strong>রাত ৮:০০ টা</strong> পর্যন্ত বুকিং নেওয়া হয়।</p>
+<!-- ===== PRICING ===== -->
+<section id="pricing">
+    <div class="container">
+        <div class="section-title">
+            <span class="label">Pricing</span>
+            <h2>মূল্য তালিকা</h2>
+            <p>সহজ ও স্বচ্ছ মূল্য — কোনো লুকানো চার্জ নেই। বড় প্রজেক্টের জন্য কাস্টম প্যাকেজও পাওয়া যাবে।</p>
+        </div>
+
+        <div class="pricing-wrap">
+            <div class="pricing-card">
+                <span class="popular">★ সবচেয়ে জনপ্রিয়</span>
+                <h3>স্ট্যান্ডার্ড প্ল্যান</h3>
+                <p class="text-muted text-sm">প্রতিটি ছবির জন্য নির্ধারিত মূল্য</p>
+                <div class="price-display">
+                    <span class="currency">৳</span><span class="amount"><?= PRICE_PER_PHOTO ?></span>
+                    <div class="unit">প্রতি ছবি</div>
                 </div>
-                <div class="card">
-                    <h3>অ্যাডভান্স বুকিং</h3>
-                    <p>যে কোনো শুটের জন্য অন্তত <strong>১-৩ দিন আগে</strong> বুকিং করলে ভালো সার্ভিস নিশ্চিত করা যাবে।</p>
-                </div>
-                <div class="card">
-                    <h3>বিশেষ নোট</h3>
-                    <p>শুক্রবার ও ছুটির দিনে বিশেষ প্যাকেজ বা প্রিমিয়াম বুকিং প্রযোজ্য হতে পারে।</p>
-                </div>
-            </div>
-            <div class="schedule">
-                <div class="day"><strong>শনিবার</strong><br>সকাল ৯টা - রাত ৮টা</div>
-                <div class="day"><strong>রবিবার</strong><br>সকাল ৯টা - রাত ৮টা</div>
-                <div class="day"><strong>সোমবার</strong><br>সকাল ৯টা - রাত ৮টা</div>
-                <div class="day"><strong>মঙ্গলবার</strong><br>সকাল ৯টা - রাত ৮টা</div>
-                <div class="day"><strong>বুধবার</strong><br>সকাল ৯টা - রাত ৮টা</div>
-                <div class="day"><strong>বৃহস্পতিবার</strong><br>সকাল ৯টা - রাত ৮টা</div>
-                <div class="day"><strong>শুক্রবার</strong><br>বিশেষ বুকিং / অগ্রিম যোগাযোগ</div>
+                <ul class="pricing-features">
+                    <li>প্রফেশনাল DSLR ক্যামেরায় শুট</li>
+                    <li>বেসিক এডিটিং ও কালার কারেকশন</li>
+                    <li>ডিজিটাল কপি ডেলিভারি</li>
+                    <li>সকাল ৯টা – রাত ৮টা সার্ভিস উইন্ডো</li>
+                    <li>বড় প্রজেক্টে কাস্টম অফার উপলব্ধ</li>
+                </ul>
+                <a href="#booking" class="btn btn-gold" style="display:block;width:100%;text-align:center;">এখনই বুকিং করুন</a>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section id="booking">
-        <div class="container">
-            <div class="section-title">
-                <h2>অ্যাডভান্স বুকিং ফর্ম</h2>
-                <p>আপনার প্রয়োজনীয় তথ্য পূরণ করে বুকিং পাঠান। আমি দ্রুত আপনার সাথে যোগাযোগ করব।</p>
-            </div>
+<!-- ===== SCHEDULE ===== -->
+<section id="schedule">
+    <div class="container">
+        <div class="section-title">
+            <span class="label">Schedule</span>
+            <h2>সাপ্তাহিক কাজের সময়সূচি</h2>
+            <p>প্রতি সপ্তাহে নিচের দিনগুলোতে বুকিং গ্রহণ করা হয়। শুক্রবার বিশেষ বুকিংয়ের জন্য আগেই যোগাযোগ করুন।</p>
+        </div>
 
-            <div class="booking-wrap">
-                <div>
-                    <?php if ($success): ?>
-                        <div class="success">ধন্যবাদ! আপনার বুকিং অনুরোধ সফলভাবে গ্রহণ করা হয়েছে। খুব শীঘ্রই আপনার সাথে যোগাযোগ করা হবে।</div>
+        <div class="schedule-grid">
+            <?php foreach ($SCHEDULE as $day => $hours): ?>
+                <div class="day-card <?= $hours ? '' : 'closed' ?>">
+                    <div class="day-name"><?= htmlspecialchars($day) ?></div>
+                    <?php if ($hours): ?>
+                        <div class="day-time"><?= htmlspecialchars($hours[0]) ?><br>থেকে<br><?= htmlspecialchars($hours[1]) ?></div>
+                    <?php else: ?>
+                        <div class="day-time">বিশেষ বুকিং<br>অগ্রিম যোগাযোগ</div>
                     <?php endif; ?>
-
-                    <form method="post" action="#booking">
-                        <div class="field">
-                            <label for="name">আপনার নাম</label>
-                            <input type="text" id="name" name="name" placeholder="পূর্ণ নাম লিখুন" required>
-                        </div>
-                        <div class="field">
-                            <label for="phone">মোবাইল নাম্বার</label>
-                            <input type="text" id="phone" name="phone" placeholder="01XXXXXXXXX" required>
-                        </div>
-                        <div class="field">
-                            <label for="service">শুটের ধরন</label>
-                            <select id="service" name="service" required>
-                                <option value="">সিলেক্ট করুন</option>
-                                <option>Wedding Photography</option>
-                                <option>Birthday Photography</option>
-                                <option>Outdoor Photoshoot</option>
-                                <option>Portrait Photography</option>
-                                <option>Event Coverage</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="date">বুকিংয়ের তারিখ</label>
-                            <input type="date" id="date" name="date" required>
-                        </div>
-                        <div class="field">
-                            <label for="time">পছন্দের সময়</label>
-                            <input type="time" id="time" name="time" required>
-                        </div>
-                        <div class="field">
-                            <label for="details">অতিরিক্ত তথ্য</label>
-                            <textarea id="details" name="details" placeholder="লোকেশন, আনুমানিক ছবির সংখ্যা, বিশেষ নির্দেশনা লিখুন"></textarea>
-                        </div>
-                        <button type="submit" class="btn">বুকিং পাঠান</button>
-                    </form>
                 </div>
+            <?php endforeach; ?>
+        </div>
 
-                <div class="info-box" id="contact">
-                    <h3>যোগাযোগ ও বুকিং তথ্য</h3>
-                    <p>আপনি চাইলে সরাসরি ফোন, WhatsApp বা Facebook-এর মাধ্যমেও যোগাযোগ করতে পারেন।</p>
-                    <ul>
-                        <li><strong>ফটোগ্রাফার:</strong> Sagor Photography</li>
-                        <li><strong>প্রতি ছবির মূল্য:</strong> ১০ টাকা</li>
-                        <li><strong>সার্ভিস সময়:</strong> সকাল ৯টা - রাত ৮টা</li>
-                        <li><strong>সাপ্তাহিক ছুটি:</strong> শুক্রবার (বিশেষ বুকিং ব্যতীত)</li>
-                        <li><strong>লোকেশন:</strong> বাংলাদেশ</li>
-                        <li><strong>মোবাইল:</strong> 01XXXXXXXXX</li>
-                        <li><strong>WhatsApp:</strong> 01XXXXXXXXX</li>
-                        <li><strong>Email:</strong> booking@example.com</li>
-                    </ul>
-                    <p>বুকিং কনফার্ম করার জন্য অগ্রিম পেমেন্ট বা ফোনে নিশ্চিতকরণ লাগতে পারে।</p>
+        <div class="time-info-row">
+            <div class="time-info-card">
+                <div class="time-icon">⏰</div>
+                <div>
+                    <h4>দৈনিক সার্ভিস সময়</h4>
+                    <p>সকাল ৯:০০ টা থেকে রাত ৮:০০ টা পর্যন্ত বুকিং নেওয়া হয়।</p>
+                </div>
+            </div>
+            <div class="time-info-card">
+                <div class="time-icon">📅</div>
+                <div>
+                    <h4>অ্যাডভান্স বুকিং</h4>
+                    <p>যেকোনো শুটের জন্য কমপক্ষে ১–৩ দিন আগে বুকিং করলে সেরা সার্ভিস নিশ্চিত।</p>
+                </div>
+            </div>
+            <div class="time-info-card">
+                <div class="time-icon">📝</div>
+                <div>
+                    <h4>বিশেষ নোট</h4>
+                    <p>শুক্রবার ও সরকারি ছুটির দিনে বিশেষ প্যাকেজ প্রযোজ্য। আগে যোগাযোগ করুন।</p>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> Sagor Photography. All rights reserved.</p>
+<!-- ===== BOOKING ===== -->
+<section id="booking">
+    <div class="container">
+        <div class="section-title">
+            <span class="label">Advance Booking</span>
+            <h2>অ্যাডভান্স বুকিং ফর্ম</h2>
+            <p>নিচের ফর্মটি পূরণ করুন। বুকিং কনফার্মেশনের জন্য শীঘ্রই আপনার সাথে যোগাযোগ করা হবে।</p>
         </div>
-    </footer>
-</body>
-</html>
+
+        <div class="booking-grid">
+            <!-- Form -->
+            <div class="booking-form-wrap">
+                <?php if ($booking['message']): ?>
+                    <div class="alert <?= $booking['success'] ? 'alert-success' : 'alert-error' ?>">
+                        <?= htmlspecialchars($booking['message']) ?>
+                    </div>
+                <?php endif; ?>
+
+                <form method="post" action="#booking" id="booking-form">
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="name">আপনার নাম <span style="color:#ef4444">*</span></label>
+                            <input type="text" id="name" name="name"
+                                   placeholder="পূর্ণ নাম লিখুন"
+                                   value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required>
+                        </div>
+                        <div class="field">
+                            <label for="phone">মোবাইল নাম্বার <span style="color:#ef4444">*</span></label>
+                            <input type="tel" id="phone" name="phone"
+                                   placeholder="01XXXXXXXXX"
+                                   value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="service">শুটের ধরন <span style="color:#ef4444">*</span></label>
+                        <select id="service" name="service" required>
+                            <option value="">সিলেক্ট করুন</option>
+                            <?php foreach ($SERVICES as $val => $label): ?>
+                                <option value="<?= htmlspecialchars($val) ?>"
+                                    <?= (($_POST['service'] ?? '') === $val) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($label) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="date">বুকিংয়ের তারিখ <span style="color:#ef4444">*</span></label>
+                            <input type="date" id="date" name="date"
+                                   value="<?= htmlspecialchars($_POST['date'] ?? '') ?>" required>
+                        </div>
+                        <div class="field">
+                            <label for="time">পছন্দের সময় <span style="color:#ef4444">*</span></label>
+                            <input type="time" id="time" name="time"
+                                   value="<?= htmlspecialchars($_POST['time'] ?? '') ?>" required>
+                            <span class="hint">সকাল ৯:০০ – রাত ৮:০০</span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="details">অতিরিক্ত তথ্য</label>
+                        <textarea id="details" name="details"
+                            placeholder="লোকেশন, আনুমানিক ছবির সংখ্যা, বিশেষ নির্দেশনা লিখুন…"><?= htmlspecialchars($_POST['details'] ?? '') ?></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-gold" style="width:100%">📨 বুকিং পাঠান</button>
+                </form>
+            </div>
+
+            <!-- Sidebar Info -->
+            <div class="booking-info">
+                <div class="info-card">
+                    <h3>📋 বুকিং তথ্য</h3>
+                    <div class="info-row"><span class="key">ফটোগ্রাফার</span><span class="val"><?= PHOTOGRAPHER_NAME ?> Photography</span></div>
+                    <div class="info-row"><span class="key">প্রতি ছবির মূল্য</span><span class="val">৳<?= PRICE_PER_PHOTO ?> টাকা</span></div>
+                    <div class="info-row"><span class="key">সার্ভিস সময়</span><span class="val">সকাল ৯টা – রাত ৮টা</span></div>
+                    <div class="info-row"><span class="key">সাপ্তাহিক ছুটি</span><span class="val">শুক্রবার*</span></div>
+                    <div class="info-row"><span class="key">লোকেশন</span><span class="val"><?= LOCATION ?></span></div>
+                </div>
+
+                <div class="info-card" id="contact">
+                    <h3>📞 যোগাযোগ</h3>
+                    <div class="info-row"><span class="key">মোবাইল</span><span class="val"><?= PHONE ?></span></div>
+                    <div class="info-row"><span class="key">WhatsApp</span><span class="val"><?= WHATSAPP ?></span></div>
+                    <div class="info-row"><span class="key">Email</span><span class="val"><?= EMAIL ?></span></div>
+                </div>
+
+                <div class="info-card">
+                    <h3>🔢 বুকিং প্রক্রিয়া</h3>
+                    <ol class="steps-list">
+                        <li>ফর্মটি পূরণ করে সাবমিট করুন</li>
+                        <li>ফোন বা WhatsApp-এ কনফার্মেশন নিন</li>
+                        <li>তারিখ ও সময় চূড়ান্ত করুন</li>
+                        <li>নির্ধারিত দিনে ফটোশুট উপভোগ করুন</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CONTACT CARDS ===== -->
+<section style="padding:40px 0 90px">
+    <div class="container">
+        <div class="section-title">
+            <span class="label">Contact</span>
+            <h2>যোগাযোগের মাধ্যম</h2>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <div class="c-icon">📞</div>
+                <h4>ফোন কল</h4>
+                <p><?= PHONE ?></p>
+            </div>
+            <div class="contact-card">
+                <div class="c-icon">💬</div>
+                <h4>WhatsApp</h4>
+                <p><?= WHATSAPP ?></p>
+            </div>
+            <div class="contact-card">
+                <div class="c-icon">📧</div>
+                <h4>ইমেইল</h4>
+                <p><?= EMAIL ?></p>
+            </div>
+            <div class="contact-card">
+                <div class="c-icon">📍</div>
+                <h4>লোকেশন</h4>
+                <p><?= LOCATION ?></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Back to top -->
+<button id="back-top" aria-label="Back to top">↑</button>
+
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
