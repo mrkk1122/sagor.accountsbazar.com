@@ -1,0 +1,24 @@
+# Sagor Photography — Apache config
+
+# Deny directory listing
+Options -Indexes
+
+# Protect bookings log
+<FilesMatch "\.log$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect includes directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block direct access to includes/
+    RewriteRule ^includes/.*$ - [F,L]
+
+    # Block direct access to bookings/
+    RewriteRule ^bookings/.*$ - [F,L]
+</IfModule>
+
+# Charset
+AddDefaultCharset UTF-8
