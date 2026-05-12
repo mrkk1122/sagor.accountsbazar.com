@@ -36,7 +36,7 @@ function handle_booking(): array {
     }
 
     // Sanitise values before writing to the log
-    $sanitise = fn(string $v): string => preg_replace('/[\r\n\t|]+/', ' ', $v);
+    $sanitise = function(string $v): string { return preg_replace('/[\r\n\t|]+/', ' ', $v); };
 
     // Save to log file
     $log_dir = __DIR__ . '/../bookings';
