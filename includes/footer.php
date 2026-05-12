@@ -30,12 +30,12 @@
     <a href="/#booking"><span class="mfb-icon" aria-hidden="true">📅</span><span class="mfb-label">বুকিং</span></a>
     <a href="/#contact"><span class="mfb-icon" aria-hidden="true">☎</span><span class="mfb-label">যোগাযোগ</span></a>
     <?php if ($__user): ?>
-        <a href="/profile.php"><span class="mfb-icon" aria-hidden="true">👤</span><span class="mfb-label">প্রোফাইল</span></a>
+        <a href="/profile.php"><span class="mfb-avatar" aria-hidden="true"><?= htmlspecialchars(mb_substr($__user['name'], 0, 1)) ?></span><span class="mfb-label">প্রোফাইল</span></a>
     <?php else: ?>
         <a href="/login.php"><span class="mfb-icon" aria-hidden="true">🔑</span><span class="mfb-label">লগইন</span></a>
     <?php endif; ?>
 </nav>
 
-<script src="js/main.js?v=20260512-4"></script>
+<script src="js/main.js?v=20260512-5"></script>
 </body>
 </html>
