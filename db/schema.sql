@@ -54,10 +54,23 @@ CREATE TABLE IF NOT EXISTS settings (
     value TEXT NOT NULL DEFAULT ''
 );
 
+CREATE TABLE IF NOT EXISTS help_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT DEFAULT '',
+    message TEXT NOT NULL,
+    status TEXT DEFAULT 'new' CHECK (status IN ('new', 'seen', 'resolved')),
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
 CREATE INDEX IF NOT EXISTS idx_photo_downloads_user_id ON photo_downloads(user_id);
 CREATE INDEX IF NOT EXISTS idx_photo_downloads_photo_id ON photo_downloads(photo_id);
+CREATE INDEX IF NOT EXISTS idx_help_requests_status ON help_requests(status);
 
 INSERT OR IGNORE INTO settings (key, value) VALUES
     ('site_name', 'Sagor Photography'),

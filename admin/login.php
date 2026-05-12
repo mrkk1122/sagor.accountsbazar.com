@@ -38,6 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>অ্যাডমিন লগইন | <?= htmlspecialchars(SITE_NAME) ?></title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
     <link rel="stylesheet" href="../css/admin.css?v=20260512-2">
     <style>
         body{display:block;background:var(--dark);}
@@ -79,5 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </div>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+}
+</script>
 </body>
 </html>

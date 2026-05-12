@@ -70,6 +70,20 @@ CREATE TABLE IF NOT EXISTS settings (
     PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS help_requests (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NULL,
+    name VARCHAR(191) NOT NULL,
+    phone VARCHAR(30) NOT NULL,
+    email VARCHAR(191) NOT NULL DEFAULT '',
+    message TEXT NOT NULL,
+    status ENUM('new', 'seen', 'resolved') NOT NULL DEFAULT 'new',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_help_requests_status (status),
+    CONSTRAINT fk_help_requests_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO settings (`key`, `value`) VALUES
     ('site_name', 'Sagor Photography'),
     ('price_per_photo', '10'),

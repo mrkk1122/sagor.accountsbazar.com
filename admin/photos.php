@@ -1,6 +1,7 @@
 <?php
 $__title = 'ছবি ম্যানেজমেন্ট';
 require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
 $db  = get_db();
 $msg = '';
@@ -27,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $category = trim($_POST['category'] ?? 'general');
         $price    = max(0, (float)($_POST['price'] ?? PHOTO_PRICE));
         $is_free  = isset($_POST['is_free']) ? 1 : 0;
+        $notify_user_id = (int)($_POST['notify_user_id'] ?? 0);
 
         if (!$title) {
             $err = 'শিরোনাম আবশ্যক।';
@@ -48,6 +50,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $db->prepare("INSERT INTO photos (title, filename, category, is_free, price) VALUES (?,?,?,?,?)")
                        ->execute([$title, $filename, $category, $is_free, $price]);
                     $msg = 'ছবি আপলোড হয়েছে।';
+
+                    if ($notify_user_id > 0) {
+                        $uStmt = $db->prepare("SELECT name, email FROM users WHERE id=? AND is_admin=0 LIMIT 1");
+                        $uStmt->execute([$notify_user_id]);
+                        $targetUser = $uStmt->fetch();
+                        if ($targetUser && !empty($targetUser['email']) && filter_var($targetUser['email'], FILTER_VALIDATE_EMAIL)) {
+                            $safeUserName = htmlspecialchars($targetUser['name'], ENT_QUOTES, 'UTF-8');
+                            $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+                            $subject = 'নতুন ছবি আপলোড হয়েছে - ' . SITE_NAME;
+                            $html = '<h3>হ্যালো ' . $safeUserName . ',</h3>'
+                                  . '<p>আপনার জন্য নতুন একটি ছবি আপলোড করা হয়েছে।</p>'
+                                  . '<p><strong>ছবির শিরোনাম:</strong> ' . $safeTitle . '</p>'
+                                  . '<p>দেখতে ভিজিট করুন: <a href="https://sagor.accountsbazar.com/profile.php">প্রোফাইল</a></p>';
+                            $text = "আপনার জন্য নতুন ছবি আপলোড করা হয়েছে: {$title}. প্রোফাইল চেক করুন।";
+                            smtp_send_mail($targetUser['email'], $subject, $html, $text);
+                            $msg .= ' নির্বাচিত ইউজারের ইমেইলে নোটিফিকেশন পাঠানো হয়েছে।';
+                        }
+                    }
                 } else {
                     $err = 'আপলোড ব্যর্থ।';
                 }
@@ -57,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $photos = $db->query("SELECT * FROM photos ORDER BY created_at DESC")->fetchAll();
+$usersForNotify = $db->query("SELECT id, name, email FROM users WHERE is_admin=0 ORDER BY name ASC")->fetchAll();
 ?>
 <?php if ($msg): ?><div class="alert alert-success"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
 <?php if ($err): ?><div class="alert alert-error"><?= htmlspecialchars($err) ?></div><?php endif; ?>
@@ -79,6 +100,14 @@ $photos = $db->query("SELECT * FROM photos ORDER BY created_at DESC")->fetchAll(
             </div>
             <div class="field"><label>মূল্য (৳)</label><input type="number" name="price" value="<?= PHOTO_PRICE ?>" min="0" step="1"></div>
             <div class="field"><label>ছবি ফাইল *</label><input type="file" name="photo_file" accept="image/jpeg,image/png,image/gif,image/webp" required></div>
+            <div class="field"><label>ইউজার সিলেক্ট (ইমেইল নোটিফিকেশন)</label>
+                <select name="notify_user_id">
+                    <option value="0">কাউকে পাঠাবেন না</option>
+                    <?php foreach ($usersForNotify as $u): ?>
+                        <option value="<?= (int)$u['id'] ?>"><?= htmlspecialchars($u['name']) ?> <?= !empty($u['email']) ? '(' . htmlspecialchars($u['email']) . ')' : '(ইমেইল নেই)' ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
         <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-size:.88rem;">

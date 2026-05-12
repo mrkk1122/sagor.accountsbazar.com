@@ -1,6 +1,36 @@
 <?php
 require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/auth.php';
 $__showHero = false;
+
+start_session();
+$__user = current_user();
+$helpMsg = '';
+$helpErr = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_help_request'])) {
+    $name = trim($_POST['name'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $message = trim($_POST['message'] ?? '');
+
+    if ($name === '' || $phone === '' || $message === '') {
+        $helpErr = 'নাম, ফোন এবং মেসেজ আবশ্যক।';
+    } elseif (!validate_bd_phone($phone)) {
+        $helpErr = 'সঠিক বাংলাদেশি ফোন নম্বর দিন।';
+    } else {
+        get_db()->prepare(
+            "INSERT INTO help_requests (user_id, name, phone, email, message) VALUES (?,?,?,?,?)"
+        )->execute([
+            $__user['id'] ?? null,
+            $name,
+            $phone,
+            $email,
+            $message,
+        ]);
+        $helpMsg = 'আপনার হেল্প রিকোয়েস্ট পাঠানো হয়েছে। খুব দ্রুত যোগাযোগ করা হবে।';
+    }
+}
 ?>
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
@@ -47,6 +77,42 @@ $__showHero = false;
                 <h4>লোকেশন</h4>
                 <p><?= LOCATION ?></p>
             </div>
+        </div>
+
+        <div class="booking-form-wrap" style="margin-top:26px;">
+            <h3 style="margin:0 0 14px;color:var(--white);">হেল্প / সাপোর্ট রিকোয়েস্ট</h3>
+
+            <?php if ($helpMsg): ?>
+                <div class="alert alert-success"><?= htmlspecialchars($helpMsg) ?></div>
+            <?php endif; ?>
+            <?php if ($helpErr): ?>
+                <div class="alert alert-error"><?= htmlspecialchars($helpErr) ?></div>
+            <?php endif; ?>
+
+            <form method="post">
+                <div class="form-row">
+                    <div class="field">
+                        <label for="help-name">নাম *</label>
+                        <input type="text" id="help-name" name="name" required value="<?= htmlspecialchars($_POST['name'] ?? ($__user['name'] ?? '')) ?>">
+                    </div>
+                    <div class="field">
+                        <label for="help-phone">ফোন *</label>
+                        <input type="tel" id="help-phone" name="phone" required value="<?= htmlspecialchars($_POST['phone'] ?? ($__user['phone'] ?? '')) ?>" placeholder="01XXXXXXXXX">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="field">
+                        <label for="help-email">ইমেইল (ঐচ্ছিক)</label>
+                        <input type="email" id="help-email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? ($__user['email'] ?? '')) ?>">
+                    </div>
+                    <div class="field">
+                        <label for="help-message">মেসেজ *</label>
+                        <textarea id="help-message" name="message" required placeholder="আপনার সমস্যা/প্রয়োজন লিখুন"><?= htmlspecialchars($_POST['message'] ?? '') ?></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" name="send_help_request" class="btn btn-gold">হেল্প রিকোয়েস্ট পাঠান</button>
+            </form>
         </div>
     </div>
 </section>

@@ -16,6 +16,8 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($__title ?? 'অ্যাডমিন') ?> | <?= htmlspecialchars(SITE_NAME) ?> অ্যাডমিন</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#d4af37">
     <link rel="stylesheet" href="../css/admin.css?v=20260512-2">
 </head>
 <body>
@@ -42,7 +44,10 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
 <main class="admin-main">
     <div class="admin-topbar">
         <h1><?= htmlspecialchars($__title ?? 'অ্যাডমিন') ?></h1>
-        <span style="color:var(--muted);font-size:.85rem;"><?= date('d M Y') ?></span>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <button id="admin-install-btn" class="btn btn-outline btn-sm" style="display:none;">📱 Install</button>
+            <span style="color:var(--muted);font-size:.85rem;"><?= date('d M Y') ?></span>
+        </div>
     </div>
     <nav class="admin-mobile-nav" aria-label="Admin quick navigation">
         <a href="index.php" class="<?= $page==='index' ? 'active':'' ?>">📊 ড্যাশবোর্ড</a>
@@ -52,3 +57,67 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
         <a href="settings.php" class="<?= $page==='settings' ? 'active':'' ?>">⚙️ সেটিংস</a>
     </nav>
     <div class="admin-content">
+<script>
+(function(){
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(function(){});
+    }
+
+    var installPrompt = null;
+    var installBtn = document.getElementById('admin-install-btn');
+    window.addEventListener('beforeinstallprompt', function(e){
+        e.preventDefault();
+        installPrompt = e;
+        if (installBtn) installBtn.style.display = 'inline-block';
+    });
+    if (installBtn) {
+        installBtn.addEventListener('click', function(){
+            if (!installPrompt) return;
+            installPrompt.prompt();
+            installPrompt.userChoice.then(function(){ installPrompt = null; });
+        });
+    }
+
+    function pushNotify(title, body) {
+        if (!('Notification' in window)) return;
+        if (Notification.permission === 'granted') {
+            new Notification(title, { body: body, icon: '/img/icon-192.png' });
+        }
+    }
+
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().catch(function(){});
+    }
+
+    var lastBookingId = Number(localStorage.getItem('admin:lastBookingId') || '0');
+    var lastHelpId = Number(localStorage.getItem('admin:lastHelpId') || '0');
+
+    function pollAdminNotifications() {
+        fetch('notifications.php?since_booking=' + encodeURIComponent(lastBookingId) + '&since_help=' + encodeURIComponent(lastHelpId), { credentials: 'same-origin' })
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+                if (!data || !data.ok) return;
+
+                if (data.new_booking_count > 0) {
+                    pushNotify('নতুন বুকিং এসেছে', data.new_booking_count + 'টি নতুন বুকিং পাওয়া গেছে।');
+                }
+                if (data.new_help_count > 0) {
+                    pushNotify('নতুন হেল্প রিকোয়েস্ট', data.new_help_count + 'টি নতুন হেল্প রিকোয়েস্ট পাওয়া গেছে।');
+                }
+
+                if (data.latest_booking_id >= 0) {
+                    lastBookingId = data.latest_booking_id;
+                    localStorage.setItem('admin:lastBookingId', String(lastBookingId));
+                }
+                if (data.latest_help_id >= 0) {
+                    lastHelpId = data.latest_help_id;
+                    localStorage.setItem('admin:lastHelpId', String(lastHelpId));
+                }
+            })
+            .catch(function(){});
+    }
+
+    pollAdminNotifications();
+    setInterval(pollAdminNotifications, 15000);
+})();
+</script>

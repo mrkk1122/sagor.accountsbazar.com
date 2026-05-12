@@ -21,6 +21,15 @@ define('DB_PATH', __DIR__ . '/../db/database.sqlite');
 define('FREE_PHOTOS_COUNT', 2);
 define('PHOTO_PRICE', 5);
 
+// Mail (SMTP over SSL/TLS)
+define('MAIL_HOST', 'mail.accountsbazar.com');
+define('MAIL_USERNAME', 'sagor@accountsbazar.com');
+define('MAIL_PASSWORD', '1410689273KK@#');
+define('MAIL_PORT', 465);
+define('MAIL_SECURITY', 'ssl'); // ssl for 465
+define('MAIL_FROM_EMAIL', 'sagor@accountsbazar.com');
+define('MAIL_FROM_NAME', SITE_NAME);
+
 // Weekly schedule: day => [ open, close ] or false if closed
 $SCHEDULE = [
     'শনিবার'       => ['সকাল ৯:০০', 'রাত ৮:০০'],

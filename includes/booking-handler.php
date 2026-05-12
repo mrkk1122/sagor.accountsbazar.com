@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/mailer.php';
 
 /**
  * Booking form handler
@@ -63,6 +64,27 @@ function handle_booking(): array {
     get_db()->prepare(
         "INSERT INTO bookings (user_id, name, phone, service, booking_date, booking_time, details) VALUES (?,?,?,?,?,?,?)"
     )->execute([$user['id'], $name, $phone, $service, $date, $time, $details]);
+
+    // Send booking confirmation email if user has an email address
+    if (!empty($user['email']) && filter_var($user['email'], FILTER_VALIDATE_EMAIL)) {
+        $safeName = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+        $safeService = htmlspecialchars($service, ENT_QUOTES, 'UTF-8');
+        $safeDate = htmlspecialchars($date, ENT_QUOTES, 'UTF-8');
+        $safeTime = htmlspecialchars($time, ENT_QUOTES, 'UTF-8');
+
+        $subject = 'Booking Confirmation - ' . SITE_NAME;
+        $html = '<h3>আপনার বুকিং কনফার্ম হয়েছে</h3>'
+              . '<p>ধন্যবাদ ' . $safeName . ', আপনার বুকিং অনুরোধ আমরা পেয়েছি।</p>'
+              . '<p><strong>সার্ভিস:</strong> ' . $safeService . '<br>'
+              . '<strong>তারিখ:</strong> ' . $safeDate . '<br>'
+              . '<strong>সময়:</strong> ' . $safeTime . '<br>'
+              . '<strong>ফোন:</strong> ' . htmlspecialchars($phone, ENT_QUOTES, 'UTF-8') . '</p>'
+              . '<p>খুব দ্রুত আমরা আপনার সাথে যোগাযোগ করব।</p>';
+        $text = "আপনার বুকিং কনফার্ম হয়েছে\n"
+              . "সার্ভিস: {$service}\nতারিখ: {$date}\nসময়: {$time}\nফোন: {$phone}\n";
+
+        smtp_send_mail($user['email'], $subject, $html, $text);
+    }
 
     return ['success' => true, 'message' => 'ধন্যবাদ ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '! আপনার বুকিং অনুরোধ সফলভাবে গৃহীত হয়েছে। শীঘ্রই ' . htmlspecialchars($phone, ENT_QUOTES, 'UTF-8') . ' নম্বরে যোগাযোগ করা হবে।'];
 }

@@ -59,10 +59,23 @@ function init_sqlite_schema(PDO $pdo): void {
         value TEXT NOT NULL DEFAULT ''
     )");
 
+    $pdo->exec("CREATE TABLE IF NOT EXISTS help_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        name TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        email TEXT DEFAULT '',
+        message TEXT NOT NULL,
+        status TEXT DEFAULT 'new' CHECK (status IN ('new', 'seen', 'resolved')),
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    )");
+
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_photo_downloads_user_id ON photo_downloads(user_id)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_photo_downloads_photo_id ON photo_downloads(photo_id)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_help_requests_status ON help_requests(status)");
 }
 
 function init_mysql_schema(PDO $pdo): void {
@@ -125,6 +138,20 @@ function init_mysql_schema(PDO $pdo): void {
         `key` VARCHAR(100) NOT NULL,
         `value` TEXT NOT NULL,
         PRIMARY KEY (`key`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS help_requests (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id BIGINT UNSIGNED NULL,
+        name VARCHAR(191) NOT NULL,
+        phone VARCHAR(30) NOT NULL,
+        email VARCHAR(191) NOT NULL DEFAULT '',
+        message TEXT NOT NULL,
+        status ENUM('new', 'seen', 'resolved') NOT NULL DEFAULT 'new',
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_help_requests_status (status),
+        CONSTRAINT fk_help_requests_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
