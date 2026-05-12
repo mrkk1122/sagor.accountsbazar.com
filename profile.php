@@ -75,9 +75,14 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .avatar{width:70px;height:70px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:var(--dark);flex-shrink:0;}
         .profile-info h2{margin:0 0 4px;color:var(--white);font-size:1.4rem;}
         .profile-info p{margin:0;color:var(--muted);font-size:.88rem;}
+        .profile-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+        .meta-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:.8rem;color:var(--light);}
+        .meta-pill.joined{background:rgba(212,175,55,.1);border-color:rgba(212,175,55,.3);color:var(--gold);}
         .balance-badge{margin-left:auto;background:rgba(212,175,55,.12);border:1px solid var(--gold);border-radius:12px;padding:12px 22px;text-align:center;}
         .balance-badge .amt{font-size:1.8rem;font-weight:700;color:var(--gold);display:block;}
         .balance-badge small{color:var(--muted);font-size:.8rem;}
+        .balance-action{margin-top:10px;display:flex;justify-content:center;}
+        .balance-action .btn{width:100%;max-width:210px;}
         .sec-card{background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:24px;margin-bottom:24px;}
         .sec-card h3{color:var(--gold);margin:0 0 16px;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
         table.data-tbl{width:100%;border-collapse:collapse;font-size:.88rem;}
@@ -96,6 +101,14 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .ph-paid{background:rgba(212,175,55,.15);color:var(--gold);border:1px solid rgba(212,175,55,.35);}
         .ph-done{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.3);}
         .ph-nobal{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.3);cursor:default;}
+        .balance-modal{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(2px);display:none;z-index:1200;padding:14px;overflow:auto;}
+        .balance-modal.active{display:block;}
+        .balance-modal-panel{width:min(960px,100%);min-height:calc(100vh - 28px);margin:0 auto;background:linear-gradient(145deg,#11161d,#161d26);border:1px solid rgba(212,175,55,.28);border-radius:16px;box-shadow:0 20px 55px rgba(0,0,0,.45);display:flex;flex-direction:column;}
+        .balance-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+        .balance-modal-head h3{margin:0;font-size:1.08rem;color:var(--gold);}
+        .balance-modal-close{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--light);border-radius:10px;padding:6px 10px;cursor:pointer;}
+        .balance-modal-body{padding:18px;display:flex;flex-direction:column;gap:14px;}
+        .balance-help{font-size:.86rem;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;}
         .nav-back{margin-bottom:20px;}
         .nav-back a{color:var(--gold);font-size:.9rem;}
         .sec-card{box-shadow:0 10px 22px rgba(0,0,0,.18);}
@@ -108,15 +121,21 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
             .profile-header{padding:20px 16px;gap:14px;}
             .profile-info h2{font-size:1.15rem;}
             .balance-badge{width:100%;margin-left:0;}
+            .balance-action .btn{max-width:none;}
             .sec-card{padding:16px;}
             table.data-tbl{font-size:.82rem;min-width:640px;}
             .photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+            .balance-modal{padding:8px;}
+            .balance-modal-panel{min-height:calc(100vh - 16px);border-radius:12px;}
+            .balance-modal-head{padding:12px 12px;}
+            .balance-modal-body{padding:12px;}
         }
         @media (max-width:480px){
             .profile-kpis{grid-template-columns:1fr;}
             .photo-grid{grid-template-columns:1fr;}
             .avatar{width:58px;height:58px;font-size:1.6rem;}
             .balance-badge .amt{font-size:1.5rem;}
+            .meta-pill{font-size:.74rem;padding:5px 8px;}
         }
     </style>
 </head>
@@ -141,13 +160,18 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         <div class="avatar"><?= mb_substr($user['name'], 0, 1) ?></div>
         <div class="profile-info">
             <h2><?= htmlspecialchars($user['name']) ?></h2>
-            <p>📞 <?= htmlspecialchars($user['phone']) ?>
-            <?php if ($user['email']): ?> &nbsp;|&nbsp; 📧 <?= htmlspecialchars($user['email']) ?><?php endif; ?></p>
-            <p style="margin-top:4px;">সদস্য হয়েছেন: <?= htmlspecialchars(substr($user['created_at'], 0, 10)) ?></p>
+            <div class="profile-meta">
+                <span class="meta-pill">📞 <?= htmlspecialchars($user['phone']) ?></span>
+                <?php if ($user['email']): ?><span class="meta-pill">📧 <?= htmlspecialchars($user['email']) ?></span><?php endif; ?>
+                <span class="meta-pill joined">✨ সদস্য হয়েছেন: <?= htmlspecialchars(substr($user['created_at'], 0, 10)) ?></span>
+            </div>
         </div>
         <div class="balance-badge">
             <span class="amt">৳<?= number_format($user['balance'], 0) ?></span>
             <small>অ্যাকাউন্ট ব্যালেন্স</small>
+            <div class="balance-action">
+                <button type="button" class="btn btn-gold" id="open-balance-modal">ব্যালেন্স যোগ</button>
+            </div>
         </div>
     </div>
 
@@ -158,23 +182,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     </div>
 
     <div class="sec-card">
-        <h3>💳 ব্যালেন্স যোগ করার রিকোয়েস্ট</h3>
-        <form method="post">
-            <div class="form-grid" style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
-                <div class="field">
-                    <label>পরিমাণ (৳)</label>
-                    <input type="number" name="amount" min="1" step="1" placeholder="যেমন: 500" required>
-                </div>
-                <div class="field">
-                    <label>নোট (ঐচ্ছিক)</label>
-                    <input type="text" name="note" maxlength="255" placeholder="bkash/নগদ ট্রানজেকশন রেফারেন্স">
-                </div>
-            </div>
-            <div style="margin-top:12px;display:flex;justify-content:flex-end;">
-                <button type="submit" name="submit_balance_request" class="btn btn-gold">রিকোয়েস্ট পাঠান</button>
-            </div>
-        </form>
-
+        <h3>💳 ব্যালেন্স রিকোয়েস্ট হিস্টোরি</h3>
         <?php if ($balanceRequests): ?>
             <div style="overflow-x:auto;margin-top:14px;">
                 <table class="data-tbl">
@@ -195,6 +203,8 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
                     </tbody>
                 </table>
             </div>
+        <?php else: ?>
+            <p style="color:var(--muted);text-align:center;padding:12px 0;">এখনো কোনো ব্যালেন্স রিকোয়েস্ট নেই।</p>
         <?php endif; ?>
     </div>
 
@@ -268,6 +278,34 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
 
 </div>
 
+<div class="balance-modal" id="balance-modal" aria-hidden="true">
+    <div class="balance-modal-panel">
+        <div class="balance-modal-head">
+            <h3>💳 ব্যালেন্স যোগ করার রিকোয়েস্ট</h3>
+            <button type="button" class="balance-modal-close" id="close-balance-modal">বন্ধ করুন ✕</button>
+        </div>
+        <div class="balance-modal-body">
+            <div class="balance-help">আপনি যে amount add করতে চান সেটি লিখে request পাঠান। অ্যাডমিন confirm করলে আপনার account balance update হবে।</div>
+            <form method="post">
+                <div class="form-grid" style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
+                    <div class="field">
+                        <label>পরিমাণ (৳)</label>
+                        <input type="number" name="amount" min="1" step="1" placeholder="যেমন: 500" value="<?= htmlspecialchars($_POST['amount'] ?? '') ?>" required>
+                    </div>
+                    <div class="field">
+                        <label>নোট (ঐচ্ছিক)</label>
+                        <input type="text" name="note" maxlength="255" placeholder="bkash/নগদ ট্রানজেকশন রেফারেন্স" value="<?= htmlspecialchars($_POST['note'] ?? '') ?>">
+                    </div>
+                </div>
+                <div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+                    <button type="button" class="btn btn-outline" id="cancel-balance-modal">বাতিল</button>
+                    <button type="submit" name="submit_balance_request" class="btn btn-gold">রিকোয়েস্ট পাঠান</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <nav class="mobile-fixed-bar" aria-label="Mobile quick navigation">
     <a href="/"><span class="mfb-icon" aria-hidden="true">🏠</span><span class="mfb-label">হোম</span></a>
     <a href="/#services"><span class="mfb-icon" aria-hidden="true">🛠</span><span class="mfb-label">সার্ভিস</span></a>
@@ -277,5 +315,42 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
 </nav>
 
 <script src="js/main.js?v=20260512-10"></script>
+<script>
+(function(){
+    var modal = document.getElementById('balance-modal');
+    var openBtn = document.getElementById('open-balance-modal');
+    var closeBtn = document.getElementById('close-balance-modal');
+    var cancelBtn = document.getElementById('cancel-balance-modal');
+    if (!modal || !openBtn) return;
+
+    function openModal() {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    openBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function(e){
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    });
+
+    <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_balance_request']) && $err): ?>
+    openModal();
+    <?php endif; ?>
+})();
+</script>
 </body>
 </html>
