@@ -106,4 +106,15 @@ INSERT INTO settings (`key`, `value`) VALUES
     ('location', 'বাংলাদেশ')
 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);
 
+-- Default Admin Login
+-- Phone: 01700000000
+-- Password: Admin@12345
+INSERT INTO users (name, phone, email, password, is_admin)
+VALUES ('Admin', '01700000000', '', '$2y$10$U9/ZbPDIkcb3Ai2.gRzpZuE2MqvSbKwTyVQeRBQs7d.aaDLxeuRBW', 1)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    email = VALUES(email),
+    password = VALUES(password),
+    is_admin = 1;
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -11,6 +11,26 @@ if (!empty($_SESSION['admin_id'])) {
 
 $error = '';
 
+function read_default_admin_credentials(): ?array {
+    $path = __DIR__ . '/../db/admin_credentials.txt';
+    if (!is_file($path)) return null;
+    $content = @file_get_contents($path);
+    if ($content === false) return null;
+
+    $phone = null;
+    $pass  = null;
+
+    if (preg_match('/^Phone:\s*(.+)$/mi', $content, $m)) {
+        $phone = trim($m[1]);
+    }
+    if (preg_match('/^Password:\s*(.+)$/mi', $content, $m)) {
+        $pass = trim($m[1]);
+    }
+
+    if (!$phone || !$pass) return null;
+    return ['phone' => $phone, 'password' => $pass];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone = trim($_POST['phone'] ?? '');
     $pass  = $_POST['password'] ?? '';
@@ -27,6 +47,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: index.php');
             exit;
         } else {
+            // Self-heal fallback: if provided credentials match admin_credentials.txt,
+            // sync admin hash in the current active DB and allow login.
+            $defaultCred = read_default_admin_credentials();
+            if ($defaultCred && $phone === $defaultCred['phone'] && hash_equals($defaultCred['password'], $pass)) {
+                $db = get_db();
+                $hash = password_hash($pass, PASSWORD_DEFAULT);
+
+                $find = $db->prepare("SELECT * FROM users WHERE phone=? LIMIT 1");
+                $find->execute([$phone]);
+                $existing = $find->fetch();
+
+                if ($existing) {
+                    $db->prepare("UPDATE users SET is_admin=1, password=? WHERE id=?")
+                       ->execute([$hash, $existing['id']]);
+                    $_SESSION['admin_id'] = $existing['id'];
+                } else {
+                    $db->prepare("INSERT INTO users (name, phone, email, password, is_admin) VALUES (?,?,?,?,1)")
+                       ->execute(['Admin', $phone, '', $hash]);
+                    $_SESSION['admin_id'] = $db->lastInsertId();
+                }
+
+                session_regenerate_id(true);
+                header('Location: index.php');
+                exit;
+            }
+
             $error = 'ফোন নম্বর বা পাসওয়ার্ড ভুল অথবা আপনি অ্যাডমিন নন।';
         }
     }
