@@ -25,14 +25,14 @@
 </footer>
 
 <nav class="mobile-fixed-bar" aria-label="Mobile quick navigation">
-    <a href="/#top">হোম</a>
-    <a href="/#services">সার্ভিস</a>
-    <a href="/#booking">বুকিং</a>
-    <a href="/#contact">যোগাযোগ</a>
+    <a href="/#top"><span class="mfb-icon" aria-hidden="true">🏠</span><span class="mfb-label">হোম</span></a>
+    <a href="/#services"><span class="mfb-icon" aria-hidden="true">🖼️</span><span class="mfb-label">সার্ভিস</span></a>
+    <a href="/#booking"><span class="mfb-icon" aria-hidden="true">📅</span><span class="mfb-label">বুকিং</span></a>
+    <a href="/#contact"><span class="mfb-icon" aria-hidden="true">📞</span><span class="mfb-label">যোগাযোগ</span></a>
     <?php if ($__user): ?>
-        <a href="/profile.php">প্রোফাইল</a>
+        <a href="/profile.php"><span class="mfb-icon" aria-hidden="true">👤</span><span class="mfb-label">প্রোফাইল</span></a>
     <?php else: ?>
-        <a href="/login.php">লগইন</a>
+        <a href="/login.php"><span class="mfb-icon" aria-hidden="true">🔐</span><span class="mfb-label">লগইন</span></a>
     <?php endif; ?>
 </nav>
 
