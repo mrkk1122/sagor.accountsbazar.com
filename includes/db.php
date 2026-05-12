@@ -1,24 +1,71 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-function get_db(): PDO {
-    static $pdo = null;
-    if ($pdo !== null) return $pdo;
+function init_sqlite_schema(PDO $pdo): void {
+    $dir = dirname(DB_PATH);
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-    $dsn = sprintf(
-        'mysql:host=%s;port=%s;dbname=%s;charset=%s',
-        DB_HOST,
-        DB_PORT,
-        DB_NAME,
-        DB_CHARSET
-    );
-    $pdo = new PDO($dsn, DB_USER, DB_PASS, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->exec('PRAGMA journal_mode=WAL');
+    $pdo->exec('PRAGMA foreign_keys=ON');
 
+    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        phone TEXT NOT NULL UNIQUE,
+        email TEXT DEFAULT '',
+        password TEXT NOT NULL,
+        balance REAL DEFAULT 0 CHECK (balance >= 0),
+        is_admin INTEGER DEFAULT 0 CHECK (is_admin IN (0, 1)),
+        created_at TEXT DEFAULT (datetime('now'))
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS bookings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        service TEXT NOT NULL,
+        booking_date TEXT NOT NULL,
+        booking_time TEXT NOT NULL,
+        details TEXT DEFAULT '',
+        status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS photos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        filename TEXT NOT NULL,
+        category TEXT DEFAULT 'general',
+        is_free INTEGER DEFAULT 0 CHECK (is_free IN (0, 1)),
+        price REAL DEFAULT 5 CHECK (price >= 0),
+        created_at TEXT DEFAULT (datetime('now'))
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS photo_downloads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        photo_id INTEGER NOT NULL,
+        amount_paid REAL DEFAULT 0 CHECK (amount_paid >= 0),
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (photo_id) REFERENCES photos(id) ON DELETE CASCADE,
+        UNIQUE (user_id, photo_id)
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL DEFAULT ''
+    )");
+
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_photo_downloads_user_id ON photo_downloads(user_id)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_photo_downloads_photo_id ON photo_downloads(photo_id)");
+}
+
+function init_mysql_schema(PDO $pdo): void {
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         name VARCHAR(191) NOT NULL,
@@ -79,6 +126,52 @@ function get_db(): PDO {
         `value` TEXT NOT NULL,
         PRIMARY KEY (`key`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function upsert_setting(PDO $pdo, string $key, string $value): void {
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    if ($driver === 'mysql') {
+        $stmt = $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
+        $stmt->execute([$key, $value]);
+        return;
+    }
+
+    $stmt = $pdo->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+    $stmt->execute([$key, $value]);
+}
+
+function get_db(): PDO {
+    static $pdo = null;
+    if ($pdo !== null) return $pdo;
+
+    $driver = defined('DB_DRIVER') ? DB_DRIVER : 'sqlite';
+    if ($driver === 'mysql') {
+        try {
+            $dsn = sprintf(
+                'mysql:host=%s;port=%s;dbname=%s;charset=%s',
+                DB_HOST,
+                DB_PORT,
+                DB_NAME,
+                DB_CHARSET
+            );
+            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]);
+            init_mysql_schema($pdo);
+        } catch (Throwable $e) {
+            error_log('MySQL connection failed, falling back to SQLite: ' . $e->getMessage());
+            $pdo = new PDO('sqlite:' . DB_PATH);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            init_sqlite_schema($pdo);
+        }
+    } else {
+        $pdo = new PDO('sqlite:' . DB_PATH);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        init_sqlite_schema($pdo);
+    }
 
     // Seed default settings
     $defaults = [
@@ -90,8 +183,7 @@ function get_db(): PDO {
         'email'             => 'booking@sagor.accountsbazar.com',
         'location'          => 'বাংলাদেশ',
     ];
-    $ins = $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
-    foreach ($defaults as $k => $v) $ins->execute([$k, $v]);
+    foreach ($defaults as $k => $v) upsert_setting($pdo, $k, $v);
 
     // Seed admin with a random password on first run
     $hasAdmin = $pdo->query("SELECT id FROM users WHERE is_admin=1")->fetch();
@@ -114,7 +206,13 @@ function get_db(): PDO {
 function get_setting(string $key, string $default = ''): string {
     static $cache = [];
     if (isset($cache[$key])) return $cache[$key];
-    $stmt = get_db()->prepare("SELECT `value` FROM settings WHERE `key`=?");
+    $db = get_db();
+    $driver = $db->getAttribute(PDO::ATTR_DRIVER_NAME);
+    if ($driver === 'mysql') {
+        $stmt = $db->prepare("SELECT `value` FROM settings WHERE `key`=?");
+    } else {
+        $stmt = $db->prepare("SELECT value FROM settings WHERE key=?");
+    }
     $stmt->execute([$key]);
     $val = $stmt->fetchColumn();
     $cache[$key] = ($val !== false) ? $val : $default;
