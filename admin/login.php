@@ -38,13 +38,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>অ্যাডমিন লগইন | <?= htmlspecialchars(SITE_NAME) ?></title>
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/admin.css?v=20260512-2">
     <style>
         body{display:block;background:var(--dark);}
         .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
         .login-card{background:var(--dark2);border:1px solid rgba(212,175,55,.2);border-radius:20px;padding:40px;width:100%;max-width:420px;}
         .login-card h2{color:#fff;margin-bottom:6px;}
         .login-card .sub{color:var(--muted);font-size:.88rem;margin-bottom:24px;}
+        @media (max-width:560px){
+            .login-wrap{padding:16px 12px;align-items:flex-start;}
+            .login-card{padding:22px 16px;border-radius:14px;}
+            .login-card h2{font-size:1.25rem;}
+        }
     </style>
 </head>
 <body>

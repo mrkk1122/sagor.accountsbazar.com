@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>নিবন্ধন | <?= htmlspecialchars(SITE_NAME) ?></title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20260512-4">
     <style>
         .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 16px;}
         .auth-card{background:var(--dark2);border:1px solid rgba(212,175,55,.2);border-radius:20px;padding:40px;width:100%;max-width:480px;}
@@ -62,6 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .auth-logo a{font-size:1.4rem;font-weight:700;color:var(--gold);}
         .auth-footer{text-align:center;margin-top:20px;color:var(--muted);font-size:.9rem;}
         .auth-footer a{color:var(--gold);}
+        @media (max-width:560px){
+            .auth-wrap{padding:24px 12px;align-items:flex-start;}
+            .auth-card{padding:24px 16px;border-radius:14px;}
+            .auth-card h2{font-size:1.35rem;}
+            .auth-logo{margin-bottom:20px;}
+            .auth-logo a{font-size:1.15rem;}
+        }
     </style>
 </head>
 <body>

@@ -16,7 +16,7 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($__title ?? 'অ্যাডমিন') ?> | <?= htmlspecialchars(SITE_NAME) ?> অ্যাডমিন</title>
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/admin.css?v=20260512-2">
 </head>
 <body>
 
@@ -44,4 +44,11 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
         <h1><?= htmlspecialchars($__title ?? 'অ্যাডমিন') ?></h1>
         <span style="color:var(--muted);font-size:.85rem;"><?= date('d M Y') ?></span>
     </div>
+    <nav class="admin-mobile-nav" aria-label="Admin quick navigation">
+        <a href="index.php" class="<?= $page==='index' ? 'active':'' ?>">📊 ড্যাশবোর্ড</a>
+        <a href="bookings.php" class="<?= $page==='bookings' ? 'active':'' ?>">📋 বুকিং</a>
+        <a href="users.php" class="<?= $page==='users' ? 'active':'' ?>">👥 ইউজার</a>
+        <a href="photos.php" class="<?= $page==='photos' ? 'active':'' ?>">🖼️ ছবি</a>
+        <a href="settings.php" class="<?= $page==='settings' ? 'active':'' ?>">⚙️ সেটিংস</a>
+    </nav>
     <div class="admin-content">

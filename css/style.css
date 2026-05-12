@@ -795,8 +795,26 @@ section { padding: 90px 0; }
 }
 
 @media (max-width: 480px) {
+    .container { width: min(1120px, 94%); }
+    .logo { font-size: 18px; }
+    .hero-text h1 { font-size: 32px; }
+    .hero-text p { font-size: 15px; }
     .hero-btns { flex-direction: column; }
     .btn { width: 100%; }
     .stats-row { flex-direction: column; }
     .schedule-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .mobile-fixed-bar {
+        left: 8px;
+        right: 8px;
+        gap: 4px;
+        padding: 6px;
+    }
+
+    .mobile-fixed-bar a {
+        padding: 8px 4px;
+        font-size: 10px;
+    }
+
+    .mobile-fixed-bar .mfb-icon { font-size: 14px; }
 }

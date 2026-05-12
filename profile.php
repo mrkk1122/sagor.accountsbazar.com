@@ -35,9 +35,13 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     <title>প্রোফাইল | <?= htmlspecialchars(SITE_NAME) ?></title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20260512-4">
     <style>
         .profile-page{padding:40px 0 80px;}
+        .profile-topbar{background:var(--dark2);border-bottom:1px solid rgba(255,255,255,.06);padding:14px 0;}
+        .profile-topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+        .profile-topbar-right{display:flex;gap:12px;align-items:center;}
+        .profile-user{color:var(--muted);font-size:.88rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .profile-header{background:var(--dark2);border:1px solid rgba(212,175,55,.18);border-radius:16px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
         .avatar{width:70px;height:70px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:var(--dark);flex-shrink:0;}
         .profile-info h2{margin:0 0 4px;color:var(--white);font-size:1.4rem;}
@@ -65,14 +69,31 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .ph-nobal{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.3);cursor:default;}
         .nav-back{margin-bottom:20px;}
         .nav-back a{color:var(--gold);font-size:.9rem;}
+        @media (max-width:768px){
+            .profile-page{padding:24px 0 88px;}
+            .profile-topbar-inner{flex-wrap:wrap;}
+            .profile-topbar-right{margin-left:auto;}
+            .profile-user{display:none;}
+            .profile-header{padding:20px 16px;gap:14px;}
+            .profile-info h2{font-size:1.15rem;}
+            .balance-badge{width:100%;margin-left:0;}
+            .sec-card{padding:16px;}
+            table.data-tbl{font-size:.82rem;min-width:640px;}
+            .photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+        }
+        @media (max-width:480px){
+            .photo-grid{grid-template-columns:1fr;}
+            .avatar{width:58px;height:58px;font-size:1.6rem;}
+            .balance-badge .amt{font-size:1.5rem;}
+        }
     </style>
 </head>
 <body>
-<div style="background:var(--dark2);border-bottom:1px solid rgba(255,255,255,.06);padding:14px 0;">
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+<div class="profile-topbar">
+    <div class="container profile-topbar-inner">
         <a href="/" class="logo" style="font-size:1.1rem;"><?= htmlspecialchars(PHOTOGRAPHER_NAME) ?> <span>Photography</span></a>
-        <div style="display:flex;gap:12px;align-items:center;">
-            <span style="color:var(--muted);font-size:.88rem;">👤 <?= htmlspecialchars($user['name']) ?></span>
+        <div class="profile-topbar-right">
+            <span class="profile-user">👤 <?= htmlspecialchars($user['name']) ?></span>
             <a href="logout.php" class="btn btn-outline" style="padding:8px 16px;font-size:.82rem;">লগআউট</a>
         </div>
     </div>
