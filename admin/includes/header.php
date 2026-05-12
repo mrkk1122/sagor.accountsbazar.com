@@ -18,7 +18,7 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
     <title><?= htmlspecialchars($__title ?? 'অ্যাডমিন') ?> | <?= htmlspecialchars(SITE_NAME) ?> অ্যাডমিন</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="../css/admin.css?v=20260512-2">
+    <link rel="stylesheet" href="../css/admin.css?v=20260512-3">
 </head>
 <body>
 
@@ -30,6 +30,7 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
     <nav class="sidebar-nav">
         <a href="index.php"    class="<?= $page==='index'    ? 'active':'' ?>"><span class="icon">📊</span> ড্যাশবোর্ড</a>
         <a href="bookings.php" class="<?= $page==='bookings' ? 'active':'' ?>"><span class="icon">📋</span> বুকিং</a>
+        <a href="balance-requests.php" class="<?= $page==='balance-requests' ? 'active':'' ?>"><span class="icon">💳</span> ব্যালেন্স রিকোয়েস্ট</a>
         <a href="users.php"    class="<?= $page==='users'    ? 'active':'' ?>"><span class="icon">👥</span> ইউজার</a>
         <a href="photos.php"   class="<?= $page==='photos'   ? 'active':'' ?>"><span class="icon">🖼️</span> ছবি</a>
         <a href="settings.php" class="<?= $page==='settings' ? 'active':'' ?>"><span class="icon">⚙️</span> সেটিংস</a>
@@ -52,6 +53,7 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
     <nav class="admin-mobile-nav" aria-label="Admin quick navigation">
         <a href="index.php" class="<?= $page==='index' ? 'active':'' ?>">📊 ড্যাশবোর্ড</a>
         <a href="bookings.php" class="<?= $page==='bookings' ? 'active':'' ?>">📋 বুকিং</a>
+        <a href="balance-requests.php" class="<?= $page==='balance-requests' ? 'active':'' ?>">💳 ব্যালেন্স</a>
         <a href="users.php" class="<?= $page==='users' ? 'active':'' ?>">👥 ইউজার</a>
         <a href="photos.php" class="<?= $page==='photos' ? 'active':'' ?>">🖼️ ছবি</a>
         <a href="settings.php" class="<?= $page==='settings' ? 'active':'' ?>">⚙️ সেটিংস</a>

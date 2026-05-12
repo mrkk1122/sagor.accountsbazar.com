@@ -6,6 +6,9 @@ require_once __DIR__ . '/../includes/mailer.php';
 $db  = get_db();
 $msg = '';
 $err = '';
+$preNotifyUserId = (int)($_GET['notify_user_id'] ?? 0);
+$preBookingId = (int)($_GET['booking_id'] ?? 0);
+$preTitle = $preBookingId > 0 ? ('Booking #' . $preBookingId . ' Photo') : '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -86,7 +89,7 @@ $usersForNotify = $db->query("SELECT id, name, email FROM users WHERE is_admin=0
     <h3>➕ নতুন ছবি আপলোড</h3>
     <form method="post" enctype="multipart/form-data">
         <div class="form-grid">
-            <div class="field"><label>শিরোনাম *</label><input type="text" name="title" required placeholder="ছবির নাম"></div>
+            <div class="field"><label>শিরোনাম *</label><input type="text" name="title" value="<?= htmlspecialchars($preTitle) ?>" required placeholder="ছবির নাম"></div>
             <div class="field"><label>ক্যাটাগরি</label>
                 <select name="category">
                     <option value="general">সাধারণ</option>
@@ -104,7 +107,7 @@ $usersForNotify = $db->query("SELECT id, name, email FROM users WHERE is_admin=0
                 <select name="notify_user_id">
                     <option value="0">কাউকে পাঠাবেন না</option>
                     <?php foreach ($usersForNotify as $u): ?>
-                        <option value="<?= (int)$u['id'] ?>"><?= htmlspecialchars($u['name']) ?> <?= !empty($u['email']) ? '(' . htmlspecialchars($u['email']) . ')' : '(ইমেইল নেই)' ?></option>
+                        <option value="<?= (int)$u['id'] ?>" <?= $preNotifyUserId === (int)$u['id'] ? 'selected' : '' ?>><?= htmlspecialchars($u['name']) ?> <?= !empty($u['email']) ? '(' . htmlspecialchars($u['email']) . ')' : '(ইমেইল নেই)' ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

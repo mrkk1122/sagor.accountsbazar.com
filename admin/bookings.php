@@ -18,6 +18,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     }
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quick_confirm'])) {
+    $bid = (int)($_POST['booking_id'] ?? 0);
+    if ($bid > 0) {
+        $db->prepare("UPDATE bookings SET status='confirmed' WHERE id=?")->execute([$bid]);
+        $msg = 'বুকিং কনফার্ম করা হয়েছে।';
+    } else {
+        $err = 'অবৈধ বুকিং আইডি।';
+    }
+}
+
 $bookings = $db->query(
     "SELECT b.*, u.name as uname FROM bookings b LEFT JOIN users u ON b.user_id=u.id ORDER BY b.created_at DESC"
 )->fetchAll();
@@ -32,7 +42,7 @@ $sn = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চি
     <div class="table-card-hdr"><h3>সকল বুকিং (<?= count($bookings) ?>)</h3></div>
     <div style="overflow-x:auto;">
     <table class="at">
-        <thead><tr><th>#</th><th>ইউজার</th><th>ফোন</th><th>সার্ভিস</th><th>তারিখ</th><th>সময়</th><th>বিস্তারিত</th><th>স্ট্যাটাস</th><th>পরিবর্তন</th></tr></thead>
+        <thead><tr><th>#</th><th>ইউজার</th><th>ফোন</th><th>সার্ভিস</th><th>তারিখ</th><th>সময়</th><th>বিস্তারিত</th><th>স্ট্যাটাস</th><th>পরিবর্তন</th><th>ক্লায়েন্ট ছবি</th></tr></thead>
         <tbody>
         <?php foreach ($bookings as $b): ?>
         <tr>
@@ -45,7 +55,7 @@ $sn = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চি
             <td style="font-size:.8rem;color:var(--muted);"><?= htmlspecialchars(substr($b['details'] ?: '-', 0, 50)) ?></td>
             <td><span class="badge <?= $sl[$b['status']] ?? '' ?>"><?= $sn[$b['status']] ?? $b['status'] ?></span></td>
             <td>
-                <form method="post" style="display:flex;gap:6px;align-items:center;">
+                <form method="post" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                     <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
                     <select name="status" style="background:var(--dark3);color:var(--light);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 8px;font-size:.8rem;">
                         <?php foreach ($sn as $sv => $sl2): ?>
@@ -53,11 +63,21 @@ $sn = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চি
                         <?php endforeach; ?>
                     </select>
                     <button type="submit" name="update_status" class="btn btn-gold btn-sm">আপডেট</button>
+                    <?php if ($b['status'] !== 'confirmed'): ?>
+                        <button type="submit" name="quick_confirm" class="btn btn-outline btn-sm">দ্রুত কনফার্ম</button>
+                    <?php endif; ?>
                 </form>
+            </td>
+            <td>
+                <?php if (!empty($b['user_id'])): ?>
+                    <a class="btn btn-outline btn-sm" href="photos.php?notify_user_id=<?= (int)$b['user_id'] ?>&booking_id=<?= (int)$b['id'] ?>">ছবি যোগ করুন</a>
+                <?php else: ?>
+                    <span style="color:var(--muted);font-size:.8rem;">ইউজার নেই</span>
+                <?php endif; ?>
             </td>
         </tr>
         <?php endforeach; ?>
-        <?php if (!$bookings): ?><tr><td colspan="9" style="text-align:center;color:var(--muted);padding:20px;">কোনো বুকিং নেই</td></tr><?php endif; ?>
+        <?php if (!$bookings): ?><tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px;">কোনো বুকিং নেই</td></tr><?php endif; ?>
         </tbody>
     </table>
     </div>

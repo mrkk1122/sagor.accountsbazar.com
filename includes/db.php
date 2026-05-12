@@ -81,12 +81,27 @@ function init_sqlite_schema(PDO $pdo): void {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )");
 
+    $pdo->exec("CREATE TABLE IF NOT EXISTS balance_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        amount REAL NOT NULL CHECK (amount > 0),
+        note TEXT DEFAULT '',
+        status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'rejected')),
+        admin_note TEXT DEFAULT '',
+        confirmed_by INTEGER,
+        confirmed_at TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (confirmed_by) REFERENCES users(id) ON DELETE SET NULL
+    )");
+
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_photo_downloads_user_id ON photo_downloads(user_id)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_photo_downloads_photo_id ON photo_downloads(photo_id)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_help_requests_status ON help_requests(status)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_password_resets_user_used ON password_resets(user_id, used)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_balance_requests_user_status ON balance_requests(user_id, status)");
 }
 
 function init_mysql_schema(PDO $pdo): void {
@@ -175,6 +190,23 @@ function init_mysql_schema(PDO $pdo): void {
         PRIMARY KEY (id),
         KEY idx_password_resets_user_used (user_id, used),
         CONSTRAINT fk_password_resets_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS balance_requests (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id BIGINT UNSIGNED NOT NULL,
+        amount DECIMAL(12,2) NOT NULL,
+        note TEXT,
+        status ENUM('pending', 'confirmed', 'rejected') NOT NULL DEFAULT 'pending',
+        admin_note TEXT,
+        confirmed_by BIGINT UNSIGNED NULL,
+        confirmed_at DATETIME NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_balance_requests_user_status (user_id, status),
+        CONSTRAINT fk_balance_requests_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        CONSTRAINT fk_balance_requests_admin FOREIGN KEY (confirmed_by) REFERENCES users(id) ON DELETE SET NULL,
+        CHECK (amount > 0)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 

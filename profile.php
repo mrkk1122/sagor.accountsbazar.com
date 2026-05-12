@@ -6,6 +6,23 @@ require_login('/login.php');
 
 $user = current_user();
 $db   = get_db();
+$msg  = '';
+$err  = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_balance_request'])) {
+    $amount = (float)($_POST['amount'] ?? 0);
+    $note = trim($_POST['note'] ?? '');
+
+    if ($amount <= 0) {
+        $err = 'সঠিক পরিমাণ লিখুন।';
+    } elseif ($amount > 1000000) {
+        $err = 'পরিমাণ খুব বেশি।';
+    } else {
+        $db->prepare("INSERT INTO balance_requests (user_id, amount, note, status) VALUES (?,?,?,'pending')")
+           ->execute([$user['id'], $amount, $note]);
+        $msg = 'ব্যালেন্স রিকোয়েস্ট পাঠানো হয়েছে। অ্যাডমিন কনফার্ম করলে ব্যালেন্স যোগ হবে।';
+    }
+}
 
 // Bookings
 $bStmt = $db->prepare("SELECT * FROM bookings WHERE user_id=? ORDER BY created_at DESC");
@@ -27,6 +44,10 @@ $downloaded = array_column($dlStmt->fetchAll(), null, 'photo_id'); // keyed by p
 $totalBookings   = count($bookings);
 $totalDownloads = count($downloaded);
 $photoCount     = count($photos);
+
+$rStmt = $db->prepare("SELECT * FROM balance_requests WHERE user_id=? ORDER BY created_at DESC LIMIT 10");
+$rStmt->execute([$user['id']]);
+$balanceRequests = $rStmt->fetchAll();
 
 $statusLabel = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চিত','completed'=>'সম্পন্ন','cancelled'=>'বাতিল'];
 $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f6','cancelled'=>'#ef4444'];
@@ -112,6 +133,9 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
 
 <div class="container profile-page">
 
+    <?php if ($msg): ?><div class="alert alert-success" style="margin-bottom:14px;"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+    <?php if ($err): ?><div class="alert alert-error" style="margin-bottom:14px;"><?= htmlspecialchars($err) ?></div><?php endif; ?>
+
     <!-- Profile Header -->
     <div class="profile-header">
         <div class="avatar"><?= mb_substr($user['name'], 0, 1) ?></div>
@@ -131,6 +155,47 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         <div class="profile-kpi"><span class="k-num"><?= $totalBookings ?></span><span class="k-lbl">মোট বুকিং</span></div>
         <div class="profile-kpi"><span class="k-num"><?= $totalDownloads ?></span><span class="k-lbl">ডাউনলোড করা ছবি</span></div>
         <div class="profile-kpi"><span class="k-num"><?= $photoCount ?></span><span class="k-lbl">মোট উপলব্ধ ছবি</span></div>
+    </div>
+
+    <div class="sec-card">
+        <h3>💳 ব্যালেন্স যোগ করার রিকোয়েস্ট</h3>
+        <form method="post">
+            <div class="form-grid" style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
+                <div class="field">
+                    <label>পরিমাণ (৳)</label>
+                    <input type="number" name="amount" min="1" step="1" placeholder="যেমন: 500" required>
+                </div>
+                <div class="field">
+                    <label>নোট (ঐচ্ছিক)</label>
+                    <input type="text" name="note" maxlength="255" placeholder="bkash/নগদ ট্রানজেকশন রেফারেন্স">
+                </div>
+            </div>
+            <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+                <button type="submit" name="submit_balance_request" class="btn btn-gold">রিকোয়েস্ট পাঠান</button>
+            </div>
+        </form>
+
+        <?php if ($balanceRequests): ?>
+            <div style="overflow-x:auto;margin-top:14px;">
+                <table class="data-tbl">
+                    <thead><tr><th>#</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>অ্যাডমিন নোট</th><th>তারিখ</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($balanceRequests as $i => $r):
+                        $clr = $r['status'] === 'confirmed' ? '#22c55e' : ($r['status'] === 'rejected' ? '#ef4444' : '#d4af37');
+                        $lbl = $r['status'] === 'confirmed' ? 'কনফার্ম' : ($r['status'] === 'rejected' ? 'বাতিল' : 'অপেক্ষমান');
+                    ?>
+                        <tr>
+                            <td><?= $i + 1 ?></td>
+                            <td>৳<?= number_format((float)$r['amount'], 0) ?></td>
+                            <td><span class="badge-status" style="color:<?= $clr ?>;border-color:<?= $clr ?>;"><?= $lbl ?></span></td>
+                            <td style="color:var(--muted);"><?= htmlspecialchars($r['admin_note'] ?: '-') ?></td>
+                            <td style="color:var(--muted);"><?= htmlspecialchars(substr($r['created_at'], 0, 16)) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
     </div>
 
     <!-- Bookings -->

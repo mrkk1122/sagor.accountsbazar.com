@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>অ্যাডমিন লগইন | <?= htmlspecialchars(SITE_NAME) ?></title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="../css/admin.css?v=20260512-2">
+    <link rel="stylesheet" href="../css/admin.css?v=20260512-3">
     <style>
         body{display:block;background:var(--dark);}
         .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}

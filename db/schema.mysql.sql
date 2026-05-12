@@ -96,6 +96,23 @@ CREATE TABLE IF NOT EXISTS password_resets (
     CONSTRAINT fk_password_resets_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS balance_requests (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    note TEXT,
+    status ENUM('pending', 'confirmed', 'rejected') NOT NULL DEFAULT 'pending',
+    admin_note TEXT,
+    confirmed_by BIGINT UNSIGNED NULL,
+    confirmed_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_balance_requests_user_status (user_id, status),
+    CONSTRAINT fk_balance_requests_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_balance_requests_admin FOREIGN KEY (confirmed_by) REFERENCES users(id) ON DELETE SET NULL,
+    CHECK (amount > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO settings (`key`, `value`) VALUES
     ('site_name', 'Sagor Photography'),
     ('price_per_photo', '10'),

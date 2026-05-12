@@ -76,12 +76,27 @@ CREATE TABLE IF NOT EXISTS password_resets (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS balance_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    amount REAL NOT NULL CHECK (amount > 0),
+    note TEXT DEFAULT '',
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'rejected')),
+    admin_note TEXT DEFAULT '',
+    confirmed_by INTEGER,
+    confirmed_at TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (confirmed_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
 CREATE INDEX IF NOT EXISTS idx_photo_downloads_user_id ON photo_downloads(user_id);
 CREATE INDEX IF NOT EXISTS idx_photo_downloads_photo_id ON photo_downloads(photo_id);
 CREATE INDEX IF NOT EXISTS idx_help_requests_status ON help_requests(status);
 CREATE INDEX IF NOT EXISTS idx_password_resets_user_used ON password_resets(user_id, used);
+CREATE INDEX IF NOT EXISTS idx_balance_requests_user_status ON balance_requests(user_id, status);
 
 INSERT OR IGNORE INTO settings (key, value) VALUES
     ('site_name', 'Sagor Photography'),
