@@ -18,6 +18,9 @@ Options -Indexes
 
     # Block direct access to bookings/
     RewriteRule ^bookings/.*$ - [F,L]
+
+    # Block direct access to db/
+    RewriteRule ^db/.*$ - [F,L]
 </IfModule>
 
 # Charset

@@ -8,6 +8,12 @@ function handle_booking(): array {
         return ['success' => false, 'message' => ''];
     }
 
+    // Require login
+    $user = current_user();
+    if (!$user) {
+        return ['success' => false, 'message' => 'বুকিং করতে প্রথমে লগইন করুন।'];
+    }
+
     // Read raw input first; htmlspecialchars is applied only when writing to HTML output
     $name    = trim($_POST['name']    ?? '');
     $phone   = trim($_POST['phone']   ?? '');
@@ -29,10 +35,10 @@ function handle_booking(): array {
         return ['success' => false, 'message' => 'অনুগ্রহ করে ভবিষ্যতের একটি তারিখ নির্বাচন করুন।'];
     }
 
-    // Sanitise values before writing to the log (strip control characters / newlines
-    // to prevent log-injection attacks)
+    // Sanitise values before writing to the log
     $sanitise = fn(string $v): string => preg_replace('/[\r\n\t|]+/', ' ', $v);
 
+    // Save to log file
     $log_dir = __DIR__ . '/../bookings';
     if (!is_dir($log_dir)) {
         mkdir($log_dir, 0755, true);
@@ -40,6 +46,7 @@ function handle_booking(): array {
 
     $entry = implode(' | ', [
         date('Y-m-d H:i:s'),
+        'UserID: '  . $user['id'],
         'Name: '    . $sanitise($name),
         'Phone: '   . $sanitise($phone),
         'Service: ' . $sanitise($service),
@@ -50,5 +57,11 @@ function handle_booking(): array {
 
     file_put_contents($log_dir . '/bookings.log', $entry, FILE_APPEND | LOCK_EX);
 
+    // Save to database
+    get_db()->prepare(
+        "INSERT INTO bookings (user_id, name, phone, service, booking_date, booking_time, details) VALUES (?,?,?,?,?,?,?)"
+    )->execute([$user['id'], $name, $phone, $service, $date, $time, $details]);
+
     return ['success' => true, 'message' => 'ধন্যবাদ ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '! আপনার বুকিং অনুরোধ সফলভাবে গৃহীত হয়েছে। শীঘ্রই ' . htmlspecialchars($phone, ENT_QUOTES, 'UTF-8') . ' নম্বরে যোগাযোগ করা হবে।'];
 }
+

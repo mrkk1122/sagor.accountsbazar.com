@@ -3,6 +3,7 @@ require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/booking-handler.php';
 
 $booking = handle_booking();
+$__user  = current_user(); // already set via header.php include chain
 ?>
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
@@ -172,6 +173,16 @@ $booking = handle_booking();
         <div class="booking-grid">
             <!-- Form -->
             <div class="booking-form-wrap">
+                <?php if (!$__user): ?>
+                    <div style="text-align:center;padding:48px 20px;">
+                        <div style="font-size:3.5rem;margin-bottom:16px;">🔒</div>
+                        <h3 style="color:var(--white);margin-bottom:10px;">বুকিং করতে লগইন করুন</h3>
+                        <p style="color:var(--muted);margin-bottom:24px;">বুকিং সুবিধা ব্যবহার করতে প্রথমে আপনার অ্যাকাউন্টে লগইন করুন।</p>
+                        <a href="/login.php" class="btn btn-gold">লগইন করুন</a>
+                        &nbsp;
+                        <a href="/register.php" class="btn btn-outline">নতুন অ্যাকাউন্ট</a>
+                    </div>
+                <?php else: ?>
                 <?php if ($booking['message']): ?>
                     <div class="alert <?= $booking['success'] ? 'alert-success' : 'alert-error' ?>">
                         <?= htmlspecialchars($booking['message']) ?>
@@ -184,13 +195,13 @@ $booking = handle_booking();
                             <label for="name">আপনার নাম <span style="color:#ef4444">*</span></label>
                             <input type="text" id="name" name="name"
                                    placeholder="পূর্ণ নাম লিখুন"
-                                   value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required>
+                                   value="<?= htmlspecialchars($_POST['name'] ?? $__user['name'] ?? '') ?>" required>
                         </div>
                         <div class="field">
                             <label for="phone">মোবাইল নাম্বার <span style="color:#ef4444">*</span></label>
                             <input type="tel" id="phone" name="phone"
                                    placeholder="01XXXXXXXXX"
-                                   value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>" required>
+                                   value="<?= htmlspecialchars($_POST['phone'] ?? $__user['phone'] ?? '') ?>" required>
                         </div>
                     </div>
 
@@ -229,6 +240,7 @@ $booking = handle_booking();
 
                     <button type="submit" class="btn btn-gold" style="width:100%">📨 বুকিং পাঠান</button>
                 </form>
+                <?php endif; ?>
             </div>
 
             <!-- Sidebar Info -->
