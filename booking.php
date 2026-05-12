@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $user = current_user();
+$__showHero = false;
 ?>
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/auth.php';
 start_session();
 $__user = current_user();
+$__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIPT_NAME']) === 'index.php');
 ?>
 <!DOCTYPE html>
 <html lang="bn">
@@ -12,7 +13,7 @@ $__user = current_user();
     <meta name="description" content="প্রফেশনাল ফটোগ্রাফি সার্ভিস - বিয়ে, জন্মদিন, আউটডোর শুট ও সকল ইভেন্টের অ্যাডভান্স বুকিং নিন।">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css?v=20260512-7">
+    <link rel="stylesheet" href="css/style.css?v=20260512-8">
 </head>
 <body>
 
@@ -38,6 +39,7 @@ $__user = current_user();
         </div>
     </div>
 
+    <?php if ($__showHero): ?>
     <!-- ===== HERO ===== -->
     <div class="hero-section">
         <div class="container hero-inner">
@@ -53,6 +55,7 @@ $__user = current_user();
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </header>
 <script>
 (function(){
