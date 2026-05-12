@@ -25,9 +25,6 @@ $__user = current_user();
             <nav id="main-nav">
                 <a href="/#about">পরিচিতি</a>
                 <a href="/#services">সার্ভিস</a>
-                <a href="/#pricing">মূল্য</a>
-                <a href="/#schedule">সময়সূচি</a>
-                <a href="/#booking">বুকিং</a>
                 <a href="/#contact">যোগাযোগ</a>
                 <?php if ($__user): ?>
                     <a href="/profile.php" style="color:var(--gold)">👤 <?= htmlspecialchars($__user['name']) ?></a>
@@ -48,8 +45,8 @@ $__user = current_user();
                 <h1>আপনার বিশেষ মুহূর্ত<br>ক্যামেরায় ধরে রাখুন</h1>
                 <p>বিয়ে, জন্মদিন, আউটডোর শুট, পোর্ট্রেট সহ সব ধরনের ইভেন্টের প্রফেশনাল ফটোগ্রাফি সার্ভিস। প্রতিটি ছবির মূল্য মাত্র <strong>৳<?= PRICE_PER_PHOTO ?></strong> টাকা।</p>
                 <div class="hero-btns">
-                    <a href="/#booking" class="btn btn-gold">এখনই বুকিং করুন</a>
-                    <a href="/#schedule" class="btn btn-outline">সময়সূচি দেখুন</a>
+                    <a href="/#services" class="btn btn-gold">সার্ভিস দেখুন</a>
+                    <a href="/#contact" class="btn btn-outline">যোগাযোগ করুন</a>
                     <button id="pwa-install-btn" class="btn btn-outline" style="display:none;align-items:center;gap:6px;">📱 অ্যাপ ইনস্টল করুন</button>
                 </div>
             </div>
