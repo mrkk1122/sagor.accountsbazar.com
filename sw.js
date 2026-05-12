@@ -1,6 +1,6 @@
 /* Sagor Photography — Service Worker */
-const CACHE  = 'sagor-v1';
-const STATIC = ['/', '/css/style.css', '/js/main.js', '/manifest.json'];
+const CACHE  = 'sagor-v2';
+const STATIC = ['/css/style.css', '/js/main.js', '/manifest.json'];
 
 // Paths that must never be cached (auth/admin/download)
 const NO_CACHE = ['/admin/', '/login.php', '/logout.php', '/register.php', '/download.php', '/profile.php'];
@@ -19,6 +19,10 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
     if (e.request.method !== 'GET') return;
+    const accept = e.request.headers.get('accept') || '';
+    const isPageRequest = e.request.mode === 'navigate' || accept.includes('text/html');
+    if (isPageRequest) return;
+
     const path = new URL(e.request.url).pathname;
     const bypass = NO_CACHE.some(p => path.startsWith(p));
     if (bypass) return;

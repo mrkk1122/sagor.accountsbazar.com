@@ -129,7 +129,7 @@ section { padding: 90px 0; }
 }
 
 .logo {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 700;
     color: var(--white);
     letter-spacing: .5px;
@@ -139,7 +139,7 @@ section { padding: 90px 0; }
 #main-nav { display: flex; gap: 24px; }
 #main-nav a {
     color: var(--muted);
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     transition: color var(--transition);
 }
@@ -967,7 +967,7 @@ section { padding: 90px 0; }
 
 @media (max-width: 480px) {
     .container { width: min(1120px, 94%); }
-    .logo { font-size: 18px; }
+    .logo { font-size: 22px; }
     .hero-text h1 { font-size: 32px; }
     .hero-text p { font-size: 15px; }
     .hero-visual { width: 100%; }
