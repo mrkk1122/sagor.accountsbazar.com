@@ -8,7 +8,7 @@ $err = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
     $fields = ['site_name','price_per_photo','free_photos_count','phone','whatsapp','email','location'];
-    $upd = $db->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+    $upd = $db->prepare("INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
     foreach ($fields as $f) {
         $val = trim($_POST[$f] ?? '');
         $upd->execute([$f, $val]);

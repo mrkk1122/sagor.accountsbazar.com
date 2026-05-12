@@ -10,6 +10,13 @@ define('EMAIL', 'booking@sagor.accountsbazar.com');
 define('LOCATION', 'বাংলাদেশ');
 
 // Database & feature constants
+define('DB_DRIVER', 'mysql');
+define('DB_HOST', 'localhost');
+define('DB_PORT', '3306');
+define('DB_NAME', 'accounts_sagor');
+define('DB_USER', 'accounts_sagor');
+define('DB_PASS', '1410689273KK@#');
+define('DB_CHARSET', 'utf8mb4');
 define('DB_PATH', __DIR__ . '/../db/database.sqlite');
 define('FREE_PHOTOS_COUNT', 2);
 define('PHOTO_PRICE', 5);
