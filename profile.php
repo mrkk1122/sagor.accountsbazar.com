@@ -44,10 +44,7 @@ $downloaded = array_column($dlStmt->fetchAll(), null, 'photo_id'); // keyed by p
 $totalBookings   = count($bookings);
 $totalDownloads = count($downloaded);
 $photoCount     = count($photos);
-
-$rStmt = $db->prepare("SELECT * FROM balance_requests WHERE user_id=? ORDER BY created_at DESC LIMIT 10");
-$rStmt->execute([$user['id']]);
-$balanceRequests = $rStmt->fetchAll();
+$adminPayNumber = get_setting('phone', PHONE);
 
 $statusLabel = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চিত','completed'=>'সম্পন্ন','cancelled'=>'বাতিল'];
 $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f6','cancelled'=>'#ef4444'];
@@ -109,6 +106,10 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .balance-modal-close{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--light);border-radius:10px;padding:6px 10px;cursor:pointer;}
         .balance-modal-body{padding:18px;display:flex;flex-direction:column;gap:14px;}
         .balance-help{font-size:.86rem;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;}
+        .pay-methods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+        .pay-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;}
+        .pay-card .m-name{font-size:.86rem;color:var(--gold);font-weight:700;margin-bottom:4px;}
+        .pay-card .m-number{font-size:.9rem;color:var(--light);font-weight:600;word-break:break-word;}
         .nav-back{margin-bottom:20px;}
         .nav-back a{color:var(--gold);font-size:.9rem;}
         .sec-card{box-shadow:0 10px 22px rgba(0,0,0,.18);}
@@ -129,6 +130,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
             .balance-modal-panel{min-height:calc(100vh - 16px);border-radius:12px;}
             .balance-modal-head{padding:12px 12px;}
             .balance-modal-body{padding:12px;}
+            .pay-methods{grid-template-columns:1fr;}
         }
         @media (max-width:480px){
             .profile-kpis{grid-template-columns:1fr;}
@@ -179,33 +181,6 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         <div class="profile-kpi"><span class="k-num"><?= $totalBookings ?></span><span class="k-lbl">মোট বুকিং</span></div>
         <div class="profile-kpi"><span class="k-num"><?= $totalDownloads ?></span><span class="k-lbl">ডাউনলোড করা ছবি</span></div>
         <div class="profile-kpi"><span class="k-num"><?= $photoCount ?></span><span class="k-lbl">মোট উপলব্ধ ছবি</span></div>
-    </div>
-
-    <div class="sec-card">
-        <h3>💳 ব্যালেন্স রিকোয়েস্ট হিস্টোরি</h3>
-        <?php if ($balanceRequests): ?>
-            <div style="overflow-x:auto;margin-top:14px;">
-                <table class="data-tbl">
-                    <thead><tr><th>#</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>অ্যাডমিন নোট</th><th>তারিখ</th></tr></thead>
-                    <tbody>
-                    <?php foreach ($balanceRequests as $i => $r):
-                        $clr = $r['status'] === 'confirmed' ? '#22c55e' : ($r['status'] === 'rejected' ? '#ef4444' : '#d4af37');
-                        $lbl = $r['status'] === 'confirmed' ? 'কনফার্ম' : ($r['status'] === 'rejected' ? 'বাতিল' : 'অপেক্ষমান');
-                    ?>
-                        <tr>
-                            <td><?= $i + 1 ?></td>
-                            <td>৳<?= number_format((float)$r['amount'], 0) ?></td>
-                            <td><span class="badge-status" style="color:<?= $clr ?>;border-color:<?= $clr ?>;"><?= $lbl ?></span></td>
-                            <td style="color:var(--muted);"><?= htmlspecialchars($r['admin_note'] ?: '-') ?></td>
-                            <td style="color:var(--muted);"><?= htmlspecialchars(substr($r['created_at'], 0, 16)) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php else: ?>
-            <p style="color:var(--muted);text-align:center;padding:12px 0;">এখনো কোনো ব্যালেন্স রিকোয়েস্ট নেই।</p>
-        <?php endif; ?>
     </div>
 
     <!-- Bookings -->
@@ -286,6 +261,20 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         </div>
         <div class="balance-modal-body">
             <div class="balance-help">আপনি যে amount add করতে চান সেটি লিখে request পাঠান। অ্যাডমিন confirm করলে আপনার account balance update হবে।</div>
+            <div class="pay-methods">
+                <div class="pay-card">
+                    <div class="m-name">bKash (বিকাশ)</div>
+                    <div class="m-number">Admin: <?= htmlspecialchars($adminPayNumber) ?></div>
+                </div>
+                <div class="pay-card">
+                    <div class="m-name">Rocket (রকেট)</div>
+                    <div class="m-number">Admin: <?= htmlspecialchars($adminPayNumber) ?></div>
+                </div>
+                <div class="pay-card">
+                    <div class="m-name">Nagad (নগদ)</div>
+                    <div class="m-number">Admin: <?= htmlspecialchars($adminPayNumber) ?></div>
+                </div>
+            </div>
             <form method="post">
                 <div class="form-grid" style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
                     <div class="field">
