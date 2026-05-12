@@ -145,6 +145,8 @@ function get_db(): PDO {
     if ($pdo !== null) return $pdo;
 
     $driver = defined('DB_DRIVER') ? DB_DRIVER : 'sqlite';
+    $mysqlError = null;
+
     if ($driver === 'mysql') {
         try {
             $dsn = sprintf(
@@ -160,17 +162,34 @@ function get_db(): PDO {
             ]);
             init_mysql_schema($pdo);
         } catch (Throwable $e) {
-            error_log('MySQL connection failed, falling back to SQLite: ' . $e->getMessage());
+            $mysqlError = $e->getMessage();
+            error_log('[DB] MySQL failed, trying SQLite fallback: ' . $mysqlError);
+            $pdo = null;
+        }
+    }
+
+    if ($pdo === null) {
+        try {
+            $dir = dirname(DB_PATH);
+            if (!is_dir($dir)) @mkdir($dir, 0755, true);
             $pdo = new PDO('sqlite:' . DB_PATH);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             init_sqlite_schema($pdo);
+        } catch (Throwable $e) {
+            // Both MySQL and SQLite failed — show a safe error page
+            $reason = $mysqlError ?? $e->getMessage();
+            http_response_code(503);
+            header('Content-Type: text/html; charset=utf-8');
+            echo '<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8"><title>ডেটাবেজ সমস্যা</title>'
+               . '<style>body{font-family:sans-serif;text-align:center;padding:60px;}'
+               . 'h1{color:#c0392b;}p{color:#555;}</style></head><body>'
+               . '<h1>সাইট সাময়িকভাবে অনুপলব্ধ</h1>'
+               . '<p>ডেটাবেজে সংযোগ করা সম্ভব হচ্ছে না। অনুগ্রহ করে কিছুক্ষণ পরে চেষ্টা করুন।</p>'
+               . '<!-- DB_ERR:' . htmlspecialchars($reason, ENT_QUOTES) . ' -->'
+               . '</body></html>';
+            exit;
         }
-    } else {
-        $pdo = new PDO('sqlite:' . DB_PATH);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        init_sqlite_schema($pdo);
     }
 
     // Seed default settings
