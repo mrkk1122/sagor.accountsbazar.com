@@ -6,11 +6,11 @@
         </div>
         <div class="footer-links">
             <h4>Quick Links</h4>
-            <a href="#about">পরিচিতি</a>
-            <a href="#services">সার্ভিস</a>
-            <a href="#pricing">মূল্য</a>
-            <a href="#schedule">সময়সূচি</a>
-            <a href="#booking">বুকিং</a>
+            <a href="/#about">পরিচিতি</a>
+            <a href="/#services">সার্ভিস</a>
+            <a href="/booking.php">বুকিং</a>
+            <a href="/#contact">যোগাযোগ</a>
+            <a href="/profile.php">প্রোফাইল</a>
         </div>
         <div class="footer-contact">
             <h4>যোগাযোগ</h4>
@@ -27,7 +27,7 @@
 <nav class="mobile-fixed-bar" aria-label="Mobile quick navigation">
     <a href="/#top"><span class="mfb-icon" aria-hidden="true">🏠</span><span class="mfb-label">হোম</span></a>
     <a href="/#services"><span class="mfb-icon" aria-hidden="true">🛠</span><span class="mfb-label">সার্ভিস</span></a>
-    <a href="/#booking"><span class="mfb-icon" aria-hidden="true">📅</span><span class="mfb-label">বুকিং</span></a>
+    <a href="/booking.php"><span class="mfb-icon" aria-hidden="true">📅</span><span class="mfb-label">বুকিং</span></a>
     <a href="/#contact"><span class="mfb-icon" aria-hidden="true">☎</span><span class="mfb-label">যোগাযোগ</span></a>
     <?php if ($__user): ?>
         <a href="/profile.php"><span class="mfb-avatar" aria-hidden="true"><?= htmlspecialchars(mb_substr($__user['name'], 0, 1)) ?></span><span class="mfb-label">প্রোফাইল</span></a>
@@ -36,6 +36,6 @@
     <?php endif; ?>
 </nav>
 
-<script src="js/main.js?v=20260512-5"></script>
+<script src="js/main.js?v=20260512-6"></script>
 </body>
 </html>

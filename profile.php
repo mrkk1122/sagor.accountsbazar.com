@@ -24,6 +24,10 @@ $dlStmt = $db->prepare("SELECT photo_id FROM photo_downloads WHERE user_id=?");
 $dlStmt->execute([$user['id']]);
 $downloaded = array_column($dlStmt->fetchAll(), null, 'photo_id'); // keyed by photo_id
 
+$totalBookings   = count($bookings);
+$totalDownloads = count($downloaded);
+$photoCount     = count($photos);
+
 $statusLabel = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চিত','completed'=>'সম্পন্ন','cancelled'=>'বাতিল'];
 $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f6','cancelled'=>'#ef4444'];
 ?>
@@ -35,14 +39,18 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     <title>প্রোফাইল | <?= htmlspecialchars(SITE_NAME) ?></title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css?v=20260512-4">
+    <link rel="stylesheet" href="css/style.css?v=20260512-6">
     <style>
         .profile-page{padding:40px 0 80px;}
+        .profile-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:24px;}
+        .profile-kpi{background:linear-gradient(140deg,rgba(212,175,55,.12),rgba(212,175,55,.04));border:1px solid rgba(212,175,55,.22);border-radius:14px;padding:16px;}
+        .profile-kpi .k-num{display:block;font-size:1.5rem;font-weight:700;color:var(--gold);line-height:1.1;}
+        .profile-kpi .k-lbl{font-size:.8rem;color:var(--muted);margin-top:5px;display:block;}
         .profile-topbar{background:var(--dark2);border-bottom:1px solid rgba(255,255,255,.06);padding:14px 0;}
         .profile-topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;}
         .profile-topbar-right{display:flex;gap:12px;align-items:center;}
         .profile-user{color:var(--muted);font-size:.88rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-        .profile-header{background:var(--dark2);border:1px solid rgba(212,175,55,.18);border-radius:16px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+        .profile-header{background:linear-gradient(120deg,rgba(22,27,34,.98),rgba(28,33,40,.96));border:1px solid rgba(212,175,55,.28);border-radius:18px;padding:30px 32px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;box-shadow:0 14px 30px rgba(0,0,0,.24);}
         .avatar{width:70px;height:70px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:var(--dark);flex-shrink:0;}
         .profile-info h2{margin:0 0 4px;color:var(--white);font-size:1.4rem;}
         .profile-info p{margin:0;color:var(--muted);font-size:.88rem;}
@@ -69,8 +77,10 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .ph-nobal{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.3);cursor:default;}
         .nav-back{margin-bottom:20px;}
         .nav-back a{color:var(--gold);font-size:.9rem;}
+        .sec-card{box-shadow:0 10px 22px rgba(0,0,0,.18);}
         @media (max-width:768px){
             .profile-page{padding:24px 0 88px;}
+            .profile-kpis{grid-template-columns:1fr 1fr;}
             .profile-topbar-inner{flex-wrap:wrap;}
             .profile-topbar-right{margin-left:auto;}
             .profile-user{display:none;}
@@ -82,6 +92,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
             .photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
         }
         @media (max-width:480px){
+            .profile-kpis{grid-template-columns:1fr;}
             .photo-grid{grid-template-columns:1fr;}
             .avatar{width:58px;height:58px;font-size:1.6rem;}
             .balance-badge .amt{font-size:1.5rem;}
@@ -116,6 +127,12 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         </div>
     </div>
 
+    <div class="profile-kpis">
+        <div class="profile-kpi"><span class="k-num"><?= $totalBookings ?></span><span class="k-lbl">মোট বুকিং</span></div>
+        <div class="profile-kpi"><span class="k-num"><?= $totalDownloads ?></span><span class="k-lbl">ডাউনলোড করা ছবি</span></div>
+        <div class="profile-kpi"><span class="k-num"><?= $photoCount ?></span><span class="k-lbl">মোট উপলব্ধ ছবি</span></div>
+    </div>
+
     <!-- Bookings -->
     <div class="sec-card">
         <h3>📋 আমার বুকিংসমূহ</h3>
@@ -142,7 +159,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         </table>
         </div>
         <?php else: ?>
-            <p style="color:var(--muted);text-align:center;padding:20px 0;">এখনো কোনো বুকিং নেই। <a href="/#booking">বুকিং করুন</a></p>
+            <p style="color:var(--muted);text-align:center;padding:20px 0;">এখনো কোনো বুকিং নেই। <a href="/booking.php">বুকিং করুন</a></p>
         <?php endif; ?>
     </div>
 

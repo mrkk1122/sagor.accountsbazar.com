@@ -12,7 +12,7 @@ $__user = current_user();
     <meta name="description" content="প্রফেশনাল ফটোগ্রাফি সার্ভিস - বিয়ে, জন্মদিন, আউটডোর শুট ও সকল ইভেন্টের অ্যাডভান্স বুকিং নিন।">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css?v=20260512-5">
+    <link rel="stylesheet" href="css/style.css?v=20260512-6">
 </head>
 <body>
 
@@ -25,6 +25,7 @@ $__user = current_user();
             <nav id="main-nav">
                 <a href="/#about">পরিচিতি</a>
                 <a href="/#services">সার্ভিস</a>
+                <a href="/booking.php">বুকিং</a>
                 <a href="/#contact">যোগাযোগ</a>
                 <?php if ($__user): ?>
                     <a href="/profile.php" class="main-nav-profile"><span class="nav-avatar"><?= htmlspecialchars(mb_substr($__user['name'], 0, 1)) ?></span> প্রোফাইল</a>
