@@ -35,12 +35,16 @@ function init_sqlite_schema(PDO $pdo): void {
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS photos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        booking_id INTEGER,
         title TEXT NOT NULL,
         filename TEXT NOT NULL,
         category TEXT DEFAULT 'general',
         is_free INTEGER DEFAULT 0 CHECK (is_free IN (0, 1)),
         price REAL DEFAULT 5 CHECK (price >= 0),
-        created_at TEXT DEFAULT (datetime('now'))
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+        FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
     )");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS photo_downloads (
@@ -137,13 +141,19 @@ function init_mysql_schema(PDO $pdo): void {
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS photos (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id BIGINT UNSIGNED NULL,
+        booking_id BIGINT UNSIGNED NULL,
         title VARCHAR(191) NOT NULL,
         filename VARCHAR(255) NOT NULL,
         category VARCHAR(100) NOT NULL DEFAULT 'general',
         is_free TINYINT(1) NOT NULL DEFAULT 0,
         price DECIMAL(12,2) NOT NULL DEFAULT 5,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id)
+        PRIMARY KEY (id),
+        KEY idx_photos_user_id (user_id),
+        KEY idx_photos_booking_id (booking_id),
+        CONSTRAINT fk_photos_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+        CONSTRAINT fk_photos_booking FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS photo_downloads (

@@ -46,6 +46,10 @@ $totalDownloads = count($downloaded);
 $photoCount     = count($photos);
 $adminPayNumber = get_setting('phone', PHONE);
 
+$rStmt = $db->prepare("SELECT * FROM balance_requests WHERE user_id=? ORDER BY created_at DESC LIMIT 20");
+$rStmt->execute([$user['id']]);
+$balanceRequests = $rStmt->fetchAll();
+
 $statusLabel = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চিত','completed'=>'সম্পন্ন','cancelled'=>'বাতিল'];
 $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f6','cancelled'=>'#ef4444'];
 ?>
@@ -75,9 +79,11 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .profile-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
         .meta-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:.8rem;color:var(--light);}
         .meta-pill.joined{background:rgba(212,175,55,.1);border-color:rgba(212,175,55,.3);color:var(--gold);}
-        .balance-badge{margin-left:auto;background:rgba(212,175,55,.12);border:1px solid var(--gold);border-radius:12px;padding:12px 22px;text-align:center;}
+        .balance-badge{margin-left:auto;background:rgba(212,175,55,.12);border:1px solid var(--gold);border-radius:12px;padding:12px 22px;text-align:center;position:relative;}
         .balance-badge .amt{font-size:1.8rem;font-weight:700;color:var(--gold);display:block;}
         .balance-badge small{color:var(--muted);font-size:.8rem;}
+        .balance-history-icon{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:var(--light);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;}
+        .balance-history-icon:hover{border-color:rgba(212,175,55,.5);color:var(--gold);background:rgba(212,175,55,.15);}
         .balance-action{margin-top:10px;display:flex;justify-content:center;}
         .balance-action .btn{width:100%;max-width:210px;}
         .sec-card{background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:24px;margin-bottom:24px;}
@@ -110,6 +116,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .pay-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;}
         .pay-card .m-name{font-size:.86rem;color:var(--gold);font-weight:700;margin-bottom:4px;}
         .pay-card .m-number{font-size:.9rem;color:var(--light);font-weight:600;word-break:break-word;}
+        .history-empty{text-align:center;color:var(--muted);padding:22px 0;}
         .nav-back{margin-bottom:20px;}
         .nav-back a{color:var(--gold);font-size:.9rem;}
         .sec-card{box-shadow:0 10px 22px rgba(0,0,0,.18);}
@@ -169,6 +176,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
             </div>
         </div>
         <div class="balance-badge">
+            <button type="button" class="balance-history-icon" id="open-balance-history-modal" title="ব্যালেন্স রিকোয়েস্ট হিস্টোরি">🕘</button>
             <span class="amt">৳<?= number_format($user['balance'], 0) ?></span>
             <small>অ্যাকাউন্ট ব্যালেন্স</small>
             <div class="balance-action">
@@ -295,6 +303,40 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     </div>
 </div>
 
+<div class="balance-modal" id="balance-history-modal" aria-hidden="true">
+    <div class="balance-modal-panel">
+        <div class="balance-modal-head">
+            <h3>🕘 ব্যালেন্স রিকোয়েস্ট হিস্টোরি</h3>
+            <button type="button" class="balance-modal-close" id="close-balance-history-modal">বন্ধ করুন ✕</button>
+        </div>
+        <div class="balance-modal-body">
+            <?php if ($balanceRequests): ?>
+            <div style="overflow-x:auto;">
+                <table class="data-tbl">
+                    <thead><tr><th>#</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>অ্যাডমিন নোট</th><th>তারিখ</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($balanceRequests as $i => $r):
+                        $clr = $r['status'] === 'confirmed' ? '#22c55e' : ($r['status'] === 'rejected' ? '#ef4444' : '#d4af37');
+                        $lbl = $r['status'] === 'confirmed' ? 'কনফার্ম' : ($r['status'] === 'rejected' ? 'বাতিল' : 'অপেক্ষমান');
+                    ?>
+                        <tr>
+                            <td><?= $i + 1 ?></td>
+                            <td>৳<?= number_format((float)$r['amount'], 0) ?></td>
+                            <td><span class="badge-status" style="color:<?= $clr ?>;border-color:<?= $clr ?>;"><?= $lbl ?></span></td>
+                            <td style="color:var(--muted);"><?= htmlspecialchars($r['admin_note'] ?: '-') ?></td>
+                            <td style="color:var(--muted);"><?= htmlspecialchars(substr($r['created_at'], 0, 16)) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php else: ?>
+            <div class="history-empty">এখনো কোনো ব্যালেন্স রিকোয়েস্ট নেই।</div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
 <nav class="mobile-fixed-bar" aria-label="Mobile quick navigation">
     <a href="/"><span class="mfb-icon" aria-hidden="true">🏠</span><span class="mfb-label">হোম</span></a>
     <a href="/#services"><span class="mfb-icon" aria-hidden="true">🛠</span><span class="mfb-label">সার্ভিস</span></a>
@@ -310,34 +352,49 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     var openBtn = document.getElementById('open-balance-modal');
     var closeBtn = document.getElementById('close-balance-modal');
     var cancelBtn = document.getElementById('cancel-balance-modal');
-    if (!modal || !openBtn) return;
 
-    function openModal() {
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
+    var historyModal = document.getElementById('balance-history-modal');
+    var openHistoryBtn = document.getElementById('open-balance-history-modal');
+    var closeHistoryBtn = document.getElementById('close-balance-history-modal');
+
+    function openModal(targetModal) {
+        if (!targetModal) return;
+        targetModal.classList.add('active');
+        targetModal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
     }
 
-    function closeModal() {
-        modal.classList.remove('active');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
+    function closeModal(targetModal) {
+        if (!targetModal) return;
+        targetModal.classList.remove('active');
+        targetModal.setAttribute('aria-hidden', 'true');
+        if ((!modal || !modal.classList.contains('active')) && (!historyModal || !historyModal.classList.contains('active'))) {
+            document.body.style.overflow = '';
+        }
     }
 
-    openBtn.addEventListener('click', openModal);
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    if (openBtn) openBtn.addEventListener('click', function(){ openModal(modal); });
+    if (closeBtn) closeBtn.addEventListener('click', function(){ closeModal(modal); });
+    if (cancelBtn) cancelBtn.addEventListener('click', function(){ closeModal(modal); });
 
-    modal.addEventListener('click', function(e){
-        if (e.target === modal) closeModal();
+    if (openHistoryBtn) openHistoryBtn.addEventListener('click', function(){ openModal(historyModal); });
+    if (closeHistoryBtn) closeHistoryBtn.addEventListener('click', function(){ closeModal(historyModal); });
+
+    [modal, historyModal].forEach(function(m){
+        if (!m) return;
+        m.addEventListener('click', function(e){
+            if (e.target === m) closeModal(m);
+        });
     });
 
     document.addEventListener('keydown', function(e){
-        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+        if (e.key !== 'Escape') return;
+        if (modal && modal.classList.contains('active')) closeModal(modal);
+        if (historyModal && historyModal.classList.contains('active')) closeModal(historyModal);
     });
 
     <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_balance_request']) && $err): ?>
-    openModal();
+    openModal(modal);
     <?php endif; ?>
 })();
 </script>

@@ -6,6 +6,7 @@ require_once __DIR__ . '/../includes/mailer.php';
 $db  = get_db();
 $msg = '';
 $err = '';
+$currentAdminId = (int)($_SESSION['admin_id'] ?? 0);
 $preNotifyUserId = (int)($_GET['notify_user_id'] ?? 0);
 $preBookingId = (int)($_GET['booking_id'] ?? 0);
 $preTitle = $preBookingId > 0 ? ('Booking #' . $preBookingId . ' Photo') : '';
@@ -32,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $price    = max(0, (float)($_POST['price'] ?? PHOTO_PRICE));
         $is_free  = isset($_POST['is_free']) ? 1 : 0;
         $notify_user_id = (int)($_POST['notify_user_id'] ?? 0);
+        $booking_id = (int)($_POST['booking_id'] ?? 0);
 
         if (!$title) {
             $err = 'শিরোনাম আবশ্যক।';
@@ -50,8 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
                 $filename = bin2hex(random_bytes(12)) . '.' . $ext;
                 if (move_uploaded_file($_FILES['photo_file']['tmp_name'], $uploadDir . $filename)) {
-                    $db->prepare("INSERT INTO photos (title, filename, category, is_free, price) VALUES (?,?,?,?,?)")
-                       ->execute([$title, $filename, $category, $is_free, $price]);
+                    $db->prepare("INSERT INTO photos (user_id, booking_id, title, filename, category, is_free, price) VALUES (?,?,?,?,?,?,?)")
+                       ->execute([$notify_user_id > 0 ? $notify_user_id : null, $booking_id > 0 ? $booking_id : null, $title, $filename, $category, $is_free, $price]);
                     $msg = 'ছবি আপলোড হয়েছে।';
 
                     if ($notify_user_id > 0) {
@@ -111,6 +113,7 @@ $usersForNotify = $db->query("SELECT id, name, email FROM users WHERE is_admin=0
                     <?php endforeach; ?>
                 </select>
             </div>
+            <input type="hidden" name="booking_id" value="<?= (int)$preBookingId ?>">
         </div>
         <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-size:.88rem;">
