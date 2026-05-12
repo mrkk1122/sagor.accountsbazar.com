@@ -66,11 +66,22 @@ CREATE TABLE IF NOT EXISTS help_requests (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    otp_hash TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used INTEGER DEFAULT 0 CHECK (used IN (0, 1)),
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
 CREATE INDEX IF NOT EXISTS idx_photo_downloads_user_id ON photo_downloads(user_id);
 CREATE INDEX IF NOT EXISTS idx_photo_downloads_photo_id ON photo_downloads(photo_id);
 CREATE INDEX IF NOT EXISTS idx_help_requests_status ON help_requests(status);
+CREATE INDEX IF NOT EXISTS idx_password_resets_user_used ON password_resets(user_id, used);
 
 INSERT OR IGNORE INTO settings (key, value) VALUES
     ('site_name', 'Sagor Photography'),

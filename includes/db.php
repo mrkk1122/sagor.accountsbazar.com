@@ -71,11 +71,22 @@ function init_sqlite_schema(PDO $pdo): void {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
     )");
 
+    $pdo->exec("CREATE TABLE IF NOT EXISTS password_resets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        otp_hash TEXT NOT NULL,
+        expires_at TEXT NOT NULL,
+        used INTEGER DEFAULT 0 CHECK (used IN (0, 1)),
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )");
+
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_photo_downloads_user_id ON photo_downloads(user_id)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_photo_downloads_photo_id ON photo_downloads(photo_id)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_help_requests_status ON help_requests(status)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_password_resets_user_used ON password_resets(user_id, used)");
 }
 
 function init_mysql_schema(PDO $pdo): void {
@@ -152,6 +163,18 @@ function init_mysql_schema(PDO $pdo): void {
         PRIMARY KEY (id),
         KEY idx_help_requests_status (status),
         CONSTRAINT fk_help_requests_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS password_resets (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id BIGINT UNSIGNED NOT NULL,
+        otp_hash VARCHAR(255) NOT NULL,
+        expires_at DATETIME NOT NULL,
+        used TINYINT(1) NOT NULL DEFAULT 0,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_password_resets_user_used (user_id, used),
+        CONSTRAINT fk_password_resets_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 

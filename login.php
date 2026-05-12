@@ -10,6 +10,11 @@ if (!empty($_SESSION['user_id'])) {
 }
 
 $error = '';
+$success = '';
+
+if (isset($_GET['reset']) && $_GET['reset'] === 'ok') {
+    $success = 'পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে। এখন লগইন করুন।';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone = trim($_POST['phone'] ?? '');
@@ -73,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if ($error): ?>
             <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
 
         <form method="post">
             <div class="field">
@@ -88,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <div class="auth-footer">
+            <div style="margin-bottom:8px;"><a href="forgot-password.php">পাসওয়ার্ড ভুলে গেছেন?</a></div>
             অ্যাকাউন্ট নেই? <a href="register.php">নিবন্ধন করুন</a>
         </div>
     </div>

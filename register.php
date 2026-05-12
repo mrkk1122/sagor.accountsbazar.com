@@ -18,10 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pass  = $_POST['password'] ?? '';
     $pass2 = $_POST['password2'] ?? '';
 
-    if (!$name || !$phone || !$pass) {
-        $error = 'নাম, ফোন নম্বর ও পাসওয়ার্ড আবশ্যক।';
+    if (!$name || !$phone || !$email || !$pass) {
+        $error = 'নাম, ফোন নম্বর, ইমেইল ও পাসওয়ার্ড আবশ্যক।';
     } elseif (!validate_bd_phone($phone)) {
         $error = 'সঠিক বাংলাদেশি ফোন নম্বর দিন (01XXXXXXXXX)।';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'সঠিক ইমেইল ঠিকানা দিন।';
     } elseif (strlen($pass) < 6) {
         $error = 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।';
     } elseif ($pass !== $pass2) {
@@ -96,9 +98,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                        value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>" required>
             </div>
             <div class="field">
-                <label for="email">ইমেইল (ঐচ্ছিক)</label>
+                  <label for="email">ইমেইল <span style="color:#ef4444">*</span></label>
                 <input type="email" id="email" name="email" placeholder="example@email.com"
-                       value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
+                      value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
             </div>
             <div class="form-row">
                 <div class="field">
