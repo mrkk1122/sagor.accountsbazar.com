@@ -13,7 +13,7 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
     <meta name="description" content="প্রফেশনাল ফটোগ্রাফি সার্ভিস - বিয়ে, জন্মদিন, আউটডোর শুট ও সকল ইভেন্টের অ্যাডভান্স বুকিং নিন।">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css?v=20260512-10">
+    <link rel="stylesheet" href="css/style.css?v=20260512-12">
 </head>
 <body>
 
@@ -48,7 +48,7 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
                 <p>বিয়ে, জন্মদিন, আউটডোর শুট, পোর্ট্রেট সহ সব ধরনের ইভেন্টের প্রফেশনাল ফটোগ্রাফি সার্ভিস। প্রতিটি ছবির মূল্য মাত্র <strong>৳<?= PRICE_PER_PHOTO ?></strong> টাকা।</p>
                 <div class="hero-btns">
                     <a href="/#services" class="btn btn-gold">সার্ভিস দেখুন</a>
-                    <a href="/#contact" class="btn btn-outline">যোগাযোগ করুন</a>
+                    <a href="/contact.php" class="btn btn-outline">যোগাযোগ করুন</a>
                     <button id="pwa-install-btn" class="btn btn-outline" style="display:none;align-items:center;gap:6px;">📱 অ্যাপ ইনস্টল করুন</button>
                 </div>
             </div>

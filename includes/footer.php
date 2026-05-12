@@ -30,12 +30,17 @@
     <a href="/booking.php"><span class="mfb-icon" aria-hidden="true">📅</span><span class="mfb-label">বুকিং</span></a>
     <a href="/contact.php"><span class="mfb-icon" aria-hidden="true">☎</span><span class="mfb-label">যোগাযোগ</span></a>
     <?php if ($__user): ?>
-        <a href="/profile.php"><span class="mfb-avatar" aria-hidden="true"><?= htmlspecialchars(mb_substr($__user['name'], 0, 1)) ?></span><span class="mfb-label">প্রোফাইল</span></a>
+        <?php
+            $__name = (string)($__user['name'] ?? '');
+            $__initial = function_exists('mb_substr') ? mb_substr($__name, 0, 1) : substr($__name, 0, 1);
+            if ($__initial === '') $__initial = '👤';
+        ?>
+        <a href="/profile.php"><span class="mfb-avatar" aria-hidden="true"><?= htmlspecialchars($__initial) ?></span><span class="mfb-label">প্রোফাইল</span></a>
     <?php else: ?>
         <a href="/login.php"><span class="mfb-icon" aria-hidden="true">🔑</span><span class="mfb-label">লগইন</span></a>
     <?php endif; ?>
 </nav>
 
-<script src="js/main.js?v=20260512-10"></script>
+<script src="js/main.js?v=20260512-12"></script>
 </body>
 </html>
