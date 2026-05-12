@@ -651,37 +651,68 @@ section { padding: 90px 0; }
 #site-footer {
     background: var(--dark2);
     border-top: 1px solid rgba(212,175,55,.1);
-    padding-top: 60px;
+    padding-top: 40px;
 }
 
 .footer-inner {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
-    gap: 40px;
-    padding-bottom: 48px;
+    gap: 24px;
+    padding-bottom: 28px;
 }
 
-.footer-brand p { color: var(--muted); margin-top: 12px; font-size: 14px; max-width: 300px; }
+.footer-brand p { color: var(--muted); margin-top: 10px; font-size: 13px; max-width: 300px; }
 
 .footer-links h4,
 .footer-contact h4 {
     color: var(--white);
-    margin-bottom: 16px;
-    font-size: 15px;
+    margin-bottom: 12px;
+    font-size: 14px;
 }
 
-.footer-links { display: flex; flex-direction: column; gap: 10px; }
-.footer-links a { color: var(--muted); font-size: 14px; transition: color var(--transition); }
+.footer-links { display: flex; flex-direction: column; gap: 8px; }
+.footer-links a { color: var(--muted); font-size: 13px; transition: color var(--transition); }
 .footer-links a:hover { color: var(--gold); }
 
-.footer-contact p { color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+.footer-contact p { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
 
 .footer-bottom {
     border-top: 1px solid rgba(255,255,255,.06);
     text-align: center;
-    padding: 18px 0;
+    padding: 12px 0;
     color: var(--muted);
+    font-size: 12px;
+}
+
+/* ---------- Booking time info ---------- */
+.booking-time-card {
+    background: linear-gradient(145deg, rgba(212,175,55,.12), rgba(22,27,34,.92));
+    border: 1px solid rgba(212,175,55,.28);
+}
+
+.booking-time-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.time-pill {
+    text-align: center;
+    padding: 10px 8px;
+    border-radius: 10px;
+    background: rgba(13,17,23,.78);
+    border: 1px solid rgba(255,255,255,.08);
+    color: var(--light);
     font-size: 13px;
+    font-weight: 600;
+}
+
+.booking-time-note {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
 }
 
 /* ---------- Mobile fixed bar ---------- */
@@ -794,14 +825,14 @@ section { padding: 90px 0; }
     }
 
     .mobile-fixed-bar .mfb-icon {
-        font-size: 18px;
+        font-size: 22px;
         line-height: 1;
         font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
     }
 
     .mobile-fixed-bar .mfb-avatar {
-        width: 22px;
-        height: 22px;
+        width: 26px;
+        height: 26px;
         border-radius: 50%;
         background: rgba(212,175,55,.18);
         border: 1px solid rgba(212,175,55,.42);
@@ -809,7 +840,7 @@ section { padding: 90px 0; }
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 11px;
+        font-size: 13px;
         font-weight: 700;
         line-height: 1;
         text-transform: uppercase;
@@ -855,5 +886,13 @@ section { padding: 90px 0; }
         font-size: 10px;
     }
 
-    .mobile-fixed-bar .mfb-icon { font-size: 16px; }
+    .mobile-fixed-bar .mfb-icon { font-size: 19px; }
+
+    .mobile-fixed-bar .mfb-avatar {
+        width: 23px;
+        height: 23px;
+        font-size: 12px;
+    }
+
+    .booking-time-grid { grid-template-columns: 1fr; }
 }

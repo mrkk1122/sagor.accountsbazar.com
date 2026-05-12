@@ -12,7 +12,7 @@ $__user = current_user();
     <meta name="description" content="প্রফেশনাল ফটোগ্রাফি সার্ভিস - বিয়ে, জন্মদিন, আউটডোর শুট ও সকল ইভেন্টের অ্যাডভান্স বুকিং নিন।">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#d4af37">
-    <link rel="stylesheet" href="css/style.css?v=20260512-6">
+    <link rel="stylesheet" href="css/style.css?v=20260512-7">
 </head>
 <body>
 

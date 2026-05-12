@@ -36,6 +36,6 @@
     <?php endif; ?>
 </nav>
 
-<script src="js/main.js?v=20260512-6"></script>
+<script src="js/main.js?v=20260512-7"></script>
 </body>
 </html>

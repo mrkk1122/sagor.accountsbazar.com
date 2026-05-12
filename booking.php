@@ -98,6 +98,19 @@ $user = current_user();
                     </ul>
                 </div>
 
+                <div class="info-card booking-time-card">
+                    <h3>⏰ বুকিং টাইম ইনফো</h3>
+                    <div class="booking-time-grid">
+                        <div class="time-pill">সকাল ৯:০০</div>
+                        <div class="time-pill">দুপুর ১২:০০</div>
+                        <div class="time-pill">বিকাল ৩:০০</div>
+                        <div class="time-pill">সন্ধ্যা ৬:০০</div>
+                    </div>
+                    <p class="booking-time-note">
+                        প্রতিদিন বুকিং টাইম রেঞ্জ 09:00 AM - 08:00 PM। জরুরি বুকিং হলে WhatsApp-এ আগে যোগাযোগ করুন।
+                    </p>
+                </div>
+
                 <div class="info-card">
                     <h3>📞 যোগাযোগ</h3>
                     <div class="info-row"><span class="key">ফোন</span><span class="val"><?= PHONE ?></span></div>
