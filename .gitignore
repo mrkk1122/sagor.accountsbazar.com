@@ -1,0 +1,6 @@
+# Git ignore sensitive runtime files
+db/*.sqlite
+db/admin_credentials.txt
+bookings/*.log
+uploads/photos/*
+!uploads/photos/.gitkeep

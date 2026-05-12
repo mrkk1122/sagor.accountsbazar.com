@@ -9,6 +9,11 @@ define('WHATSAPP', '01XXXXXXXXX');
 define('EMAIL', 'booking@sagor.accountsbazar.com');
 define('LOCATION', 'বাংলাদেশ');
 
+// Database & feature constants
+define('DB_PATH', __DIR__ . '/../db/database.sqlite');
+define('FREE_PHOTOS_COUNT', 2);
+define('PHOTO_PRICE', 5);
+
 // Weekly schedule: day => [ open, close ] or false if closed
 $SCHEDULE = [
     'শনিবার'       => ['সকাল ৯:০০', 'রাত ৮:০০'],
