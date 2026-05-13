@@ -28,14 +28,9 @@ $dlChk->execute([$user['id'], $photoId]);
 $alreadyDl = $dlChk->fetch();
 
 if (!$alreadyDl) {
-    // Determine if this is a free slot (0-indexed position among all photos)
-    $posStmt = $db->query("SELECT id FROM photos ORDER BY created_at ASC");
-    $allIds  = array_column($posStmt->fetchAll(), 'id');
-    $pos     = array_search($photoId, $allIds); // 0-based
-    $freeCount = (int)get_setting('free_photos_count', (string)FREE_PHOTOS_COUNT);
-    $isFreeSlot = ($pos !== false && $pos < $freeCount) || (bool)$photo['is_free'];
+    $isFreePhoto = (bool)$photo['is_free'];
 
-    if ($isFreeSlot) {
+    if ($isFreePhoto) {
         $db->prepare("INSERT INTO photo_downloads (user_id, photo_id, amount_paid) VALUES (?,?,0)")
            ->execute([$user['id'], $photoId]);
     } else {

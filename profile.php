@@ -39,9 +39,7 @@ try {
     $photos = $db->query("SELECT * FROM photos ORDER BY created_at ASC")->fetchAll();
 }
 
-// Build free-slot IDs from DB order (mirrors download.php logic exactly)
-$freeCount   = (int)get_setting('free_photos_count', (string)FREE_PHOTOS_COUNT);
-$freePhotoIds = array_column(array_slice($photos, 0, $freeCount), 'id');
+// Paid/Free is controlled by admin via photos.is_free
 
 // Already downloaded
 $dlStmt = $db->prepare("SELECT photo_id FROM photo_downloads WHERE user_id=?");
@@ -233,16 +231,15 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
 
     <!-- Photo Gallery -->
     <div class="sec-card">
-        <h3>🖼️ ফটো গ্যালারি <span style="font-size:.8rem;color:var(--muted);font-weight:400;">(প্রথম <?= $freeCount ?>টি বিনামূল্যে, বাকি প্রতিটি ৳<?= PHOTO_PRICE ?>)</span></h3>
+        <h3>🖼️ ফটো গ্যালারি <span style="font-size:.8rem;color:var(--muted);font-weight:400;">(Free/Paid অ্যাডমিন সেটিং অনুযায়ী)</span></h3>
 
         <?php if (!$photos): ?>
             <p style="color:var(--muted);text-align:center;padding:24px 0;">এখনো কোনো ছবি আপলোড হয়নি।</p>
         <?php else: ?>
         <div class="photo-grid">
             <?php foreach ($photos as $p):
-                $isFreeSlot = in_array($p['id'], $freePhotoIds, true);
                 $alreadyDl  = isset($downloaded[$p['id']]);
-                $isPaidPhoto = !($isFreeSlot || $p['is_free']);
+                $isPaidPhoto = !(bool)$p['is_free'];
                 $showPaidLookIcon = $isPaidPhoto && !$alreadyDl;
                 $photoPath  = 'uploads/photos/' . $p['filename'];
                 $hasFile    = file_exists(__DIR__ . '/' . $photoPath);
@@ -262,7 +259,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
                     <div class="ph-title"><?= htmlspecialchars($p['title']) ?></div>
                     <?php if ($alreadyDl): ?>
                         <a href="download.php?photo_id=<?= $p['id'] ?>" class="ph-action ph-done">✓ ডাউনলোড করা আছে</a>
-                    <?php elseif ($isFreeSlot || $p['is_free']): ?>
+                    <?php elseif ($p['is_free']): ?>
                         <a href="download.php?photo_id=<?= $p['id'] ?>" class="ph-action ph-free">বিনামূল্যে ডাউনলোড</a>
                     <?php elseif ($user['balance'] >= $p['price']): ?>
                         <a href="download.php?photo_id=<?= $p['id'] ?>" class="ph-action ph-paid">৳<?= $p['price'] ?> দিয়ে Unlock + Download</a>
