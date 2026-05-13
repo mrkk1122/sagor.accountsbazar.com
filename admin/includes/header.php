@@ -46,7 +46,7 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
     <div class="admin-topbar">
         <h1><?= htmlspecialchars($__title ?? 'অ্যাডমিন') ?></h1>
         <div style="display:flex;align-items:center;gap:10px;">
-            <button id="admin-install-btn" class="btn btn-outline btn-sm" style="display:none;">📱 Install</button>
+            <button id="admin-install-btn" class="btn btn-outline btn-sm" style="display:none;" disabled>📱 Install</button>
             <span style="color:var(--muted);font-size:.85rem;"><?= date('d M Y') ?></span>
         </div>
     </div>
@@ -70,13 +70,19 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
     window.addEventListener('beforeinstallprompt', function(e){
         e.preventDefault();
         installPrompt = e;
-        if (installBtn) installBtn.style.display = 'inline-block';
+        if (installBtn) {
+            installBtn.style.display = 'inline-block';
+            installBtn.disabled = false;
+        }
     });
     if (installBtn) {
         installBtn.addEventListener('click', function(){
             if (!installPrompt) return;
             installPrompt.prompt();
-            installPrompt.userChoice.then(function(){ installPrompt = null; });
+            installPrompt.userChoice.then(function(){
+                installPrompt = null;
+                installBtn.disabled = true;
+            });
         });
     }
 
@@ -84,6 +90,8 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
         if (!('Notification' in window)) return;
         if (Notification.permission === 'granted') {
             new Notification(title, { body: body, icon: '/img/icon-192.png' });
+        } else if (Notification.permission === 'denied') {
+            alert('Notification permission denied!\nনোটিফিকেশন চালু করতে ব্রাউজার সেটিংস থেকে অনুমতি দিন।');
         }
     }
 
