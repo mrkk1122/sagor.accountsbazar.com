@@ -101,9 +101,10 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
         .photo-card{background:var(--dark3);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;}
         .photo-card .photo-media{position:relative;background:#0f141b;}
+        .photo-card .photo-media.is-previewable{cursor:zoom-in;}
         .photo-card img{width:100%;aspect-ratio:4/3;object-fit:contain;display:block;background:#0f141b;}
         .photo-card .ph-img-placeholder{width:100%;aspect-ratio:4/3;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--muted);}
-        .photo-card .paid-look-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.82);color:#fff;backdrop-filter:blur(1px);pointer-events:none;}
+        .photo-card .paid-look-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;background:rgba(0,0,0,.58);border:2px solid rgba(255,255,255,.82);color:#fff;backdrop-filter:blur(1px);pointer-events:none;}
         .photo-card .ph-body{padding:12px;}
         .photo-card .ph-title{font-size:.88rem;color:var(--light);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .photo-card .ph-action{display:block;text-align:center;padding:8px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;width:100%;}
@@ -114,6 +115,10 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .balance-modal{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(2px);display:none;z-index:1200;padding:14px;overflow:auto;}
         .balance-modal.active{display:block;}
         .balance-modal-panel{width:min(960px,100%);min-height:calc(100vh - 28px);margin:0 auto;background:linear-gradient(145deg,#11161d,#161d26);border:1px solid rgba(212,175,55,.28);border-radius:16px;box-shadow:0 20px 55px rgba(0,0,0,.45);display:flex;flex-direction:column;}
+        .photo-preview-modal{position:fixed;inset:0;z-index:1400;display:none;background:rgba(0,0,0,.92);padding:10px;}
+        .photo-preview-modal.active{display:flex;align-items:center;justify-content:center;}
+        .photo-preview-modal .preview-close{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:10px;padding:8px 12px;cursor:pointer;z-index:2;}
+        .photo-preview-modal .preview-image{max-width:100%;max-height:calc(100vh - 24px);object-fit:contain;border-radius:10px;box-shadow:0 24px 60px rgba(0,0,0,.5);}
         .balance-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
         .balance-modal-head h3{margin:0;font-size:1.08rem;color:var(--gold);}
         .balance-modal-close{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--light);border-radius:10px;padding:6px 10px;cursor:pointer;}
@@ -241,18 +246,19 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
                 $alreadyDl  = isset($downloaded[$p['id']]);
                 $isPaidPhoto = !(bool)$p['is_free'];
                 $showPaidLookIcon = $isPaidPhoto && !$alreadyDl;
+                $canPreview = !$showPaidLookIcon;
                 $photoPath  = 'uploads/photos/' . $p['filename'];
                 $hasFile    = file_exists(__DIR__ . '/' . $photoPath);
             ?>
             <div class="photo-card">
-                <div class="photo-media">
+                <div class="photo-media<?= ($hasFile && $canPreview) ? ' is-previewable js-photo-preview' : '' ?>"<?= ($hasFile && $canPreview) ? ' data-fullsrc="' . htmlspecialchars($photoPath, ENT_QUOTES, 'UTF-8') . '" data-title="' . htmlspecialchars($p['title'], ENT_QUOTES, 'UTF-8') . '"' : '' ?>>
                     <?php if ($hasFile): ?>
                         <img src="<?= htmlspecialchars($photoPath) ?>" alt="<?= htmlspecialchars($p['title']) ?>" loading="lazy">
                     <?php else: ?>
                         <div class="ph-img-placeholder">📷</div>
                     <?php endif; ?>
                     <?php if ($showPaidLookIcon): ?>
-                        <span class="paid-look-icon" title="Paid Photo">👁</span>
+                        <span class="paid-look-icon" title="Locked Photo">🔒</span>
                     <?php endif; ?>
                 </div>
                 <div class="ph-body">
@@ -273,6 +279,11 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         <?php endif; ?>
     </div>
 
+</div>
+
+<div class="photo-preview-modal" id="photo-preview-modal" aria-hidden="true">
+    <button type="button" class="preview-close" id="close-photo-preview">বন্ধ করুন ✕</button>
+    <img src="" alt="" class="preview-image" id="photo-preview-image">
 </div>
 
 <div class="balance-modal" id="balance-modal" aria-hidden="true">
@@ -370,6 +381,9 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     var historyModal = document.getElementById('balance-history-modal');
     var openHistoryBtn = document.getElementById('open-balance-history-modal');
     var closeHistoryBtn = document.getElementById('close-balance-history-modal');
+    var photoPreviewModal = document.getElementById('photo-preview-modal');
+    var photoPreviewImage = document.getElementById('photo-preview-image');
+    var closePhotoPreviewBtn = document.getElementById('close-photo-preview');
 
     function openModal(targetModal) {
         if (!targetModal) return;
@@ -394,6 +408,38 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     if (openHistoryBtn) openHistoryBtn.addEventListener('click', function(){ openModal(historyModal); });
     if (closeHistoryBtn) closeHistoryBtn.addEventListener('click', function(){ closeModal(historyModal); });
 
+    function openPhotoPreview(src, title) {
+        if (!photoPreviewModal || !photoPreviewImage || !src) return;
+        photoPreviewImage.src = src;
+        photoPreviewImage.alt = title || 'Preview';
+        photoPreviewModal.classList.add('active');
+        photoPreviewModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePhotoPreview() {
+        if (!photoPreviewModal || !photoPreviewImage) return;
+        photoPreviewModal.classList.remove('active');
+        photoPreviewModal.setAttribute('aria-hidden', 'true');
+        photoPreviewImage.src = '';
+        if ((!modal || !modal.classList.contains('active')) && (!historyModal || !historyModal.classList.contains('active'))) {
+            document.body.style.overflow = '';
+        }
+    }
+
+    document.querySelectorAll('.js-photo-preview').forEach(function(el){
+        el.addEventListener('click', function(){
+            openPhotoPreview(el.getAttribute('data-fullsrc'), el.getAttribute('data-title'));
+        });
+    });
+
+    if (closePhotoPreviewBtn) closePhotoPreviewBtn.addEventListener('click', closePhotoPreview);
+    if (photoPreviewModal) {
+        photoPreviewModal.addEventListener('click', function(e){
+            if (e.target === photoPreviewModal) closePhotoPreview();
+        });
+    }
+
     [modal, historyModal].forEach(function(m){
         if (!m) return;
         m.addEventListener('click', function(e){
@@ -405,6 +451,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         if (e.key !== 'Escape') return;
         if (modal && modal.classList.contains('active')) closeModal(modal);
         if (historyModal && historyModal.classList.contains('active')) closeModal(historyModal);
+        if (photoPreviewModal && photoPreviewModal.classList.contains('active')) closePhotoPreview();
     });
 
     <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_balance_request']) && $err): ?>
