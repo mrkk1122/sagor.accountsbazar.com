@@ -57,13 +57,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $allowed_mime = ['image/jpeg','image/png','image/gif','image/webp'];
                 $allowed_ext = ['jpg','jpeg','png','gif','webp'];
-                
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mime = finfo_file($finfo, $_FILES['photo_file']['tmp_name']);
-                finfo_close($finfo);
                 $ext = strtolower(pathinfo($_FILES['photo_file']['name'], PATHINFO_EXTENSION));
 
-                if (!in_array($mime, $allowed_mime, true) || !in_array($ext, $allowed_ext, true)) {
+                // Some hosts disable fileinfo; avoid fatal error and use safe fallback.
+                $mime = '';
+                if (function_exists('finfo_open')) {
+                    $finfo = @finfo_open(FILEINFO_MIME_TYPE);
+                    if ($finfo) {
+                        $mime = (string)@finfo_file($finfo, $_FILES['photo_file']['tmp_name']);
+                        @finfo_close($finfo);
+                    }
+                } elseif (function_exists('mime_content_type')) {
+                    $mime = (string)@mime_content_type($_FILES['photo_file']['tmp_name']);
+                }
+
+                // If MIME couldn't be detected, rely on extension allow-list.
+                $mimeOk = ($mime === '') ? true : in_array($mime, $allowed_mime, true);
+
+                if (!$mimeOk || !in_array($ext, $allowed_ext, true)) {
                     $err = 'শুধু JPG, PNG, GIF, WebP গ্রহণযোগ্য।';
                 } else {
                     $uploadDir = __DIR__ . '/../uploads/photos/';

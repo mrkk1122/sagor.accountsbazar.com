@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS bookings (
 
 CREATE TABLE IF NOT EXISTS photos (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NULL,
+    booking_id BIGINT UNSIGNED NULL,
     title VARCHAR(191) NOT NULL,
     filename VARCHAR(255) NOT NULL,
     category VARCHAR(100) NOT NULL DEFAULT 'general',
@@ -45,6 +47,10 @@ CREATE TABLE IF NOT EXISTS photos (
     price DECIMAL(12,2) NOT NULL DEFAULT 5,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
+    KEY idx_photos_user_id (user_id),
+    KEY idx_photos_booking_id (booking_id),
+    CONSTRAINT fk_photos_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_photos_booking FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL,
     CHECK (is_free IN (0, 1)),
     CHECK (price >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

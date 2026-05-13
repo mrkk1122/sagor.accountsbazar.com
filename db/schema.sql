@@ -30,12 +30,16 @@ CREATE TABLE IF NOT EXISTS bookings (
 
 CREATE TABLE IF NOT EXISTS photos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    booking_id INTEGER,
     title TEXT NOT NULL,
     filename TEXT NOT NULL,
     category TEXT DEFAULT 'general',
     is_free INTEGER DEFAULT 0 CHECK (is_free IN (0, 1)),
     price REAL DEFAULT 5 CHECK (price >= 0),
-    created_at TEXT DEFAULT (datetime('now'))
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS photo_downloads (
