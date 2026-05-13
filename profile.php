@@ -102,8 +102,10 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .badge-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8rem;font-weight:600;border:1px solid;}
         .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
         .photo-card{background:var(--dark3);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;}
-        .photo-card img{width:100%;height:150px;object-fit:cover;display:block;}
-        .photo-card .ph-img-placeholder{width:100%;height:150px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--muted);}
+        .photo-card .photo-media{position:relative;background:#0f141b;}
+        .photo-card img{width:100%;aspect-ratio:4/3;object-fit:contain;display:block;background:#0f141b;}
+        .photo-card .ph-img-placeholder{width:100%;aspect-ratio:4/3;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--muted);}
+        .photo-card .paid-look-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.82);color:#fff;backdrop-filter:blur(1px);pointer-events:none;}
         .photo-card .ph-body{padding:12px;}
         .photo-card .ph-title{font-size:.88rem;color:var(--light);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .photo-card .ph-action{display:block;text-align:center;padding:8px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;width:100%;}
@@ -148,10 +150,11 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         }
         @media (max-width:480px){
             .profile-kpis{grid-template-columns:1fr;}
-            .photo-grid{grid-template-columns:1fr;}
+            .photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
             .avatar{width:58px;height:58px;font-size:1.6rem;}
             .balance-badge .amt{font-size:1.5rem;}
             .meta-pill{font-size:.74rem;padding:5px 8px;}
+            .photo-card .paid-look-icon{width:44px;height:44px;font-size:1.35rem;}
         }
     </style>
 </head>
@@ -239,15 +242,21 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
             <?php foreach ($photos as $p):
                 $isFreeSlot = in_array($p['id'], $freePhotoIds, true);
                 $alreadyDl  = isset($downloaded[$p['id']]);
+                $isPaidPhoto = !($isFreeSlot || $p['is_free']);
                 $photoPath  = 'uploads/photos/' . $p['filename'];
                 $hasFile    = file_exists(__DIR__ . '/' . $photoPath);
             ?>
             <div class="photo-card">
-                <?php if ($hasFile): ?>
-                    <img src="<?= htmlspecialchars($photoPath) ?>" alt="<?= htmlspecialchars($p['title']) ?>" loading="lazy">
-                <?php else: ?>
-                    <div class="ph-img-placeholder">📷</div>
-                <?php endif; ?>
+                <div class="photo-media">
+                    <?php if ($hasFile): ?>
+                        <img src="<?= htmlspecialchars($photoPath) ?>" alt="<?= htmlspecialchars($p['title']) ?>" loading="lazy">
+                    <?php else: ?>
+                        <div class="ph-img-placeholder">📷</div>
+                    <?php endif; ?>
+                    <?php if ($isPaidPhoto): ?>
+                        <span class="paid-look-icon" title="Paid Photo">👁</span>
+                    <?php endif; ?>
+                </div>
                 <div class="ph-body">
                     <div class="ph-title"><?= htmlspecialchars($p['title']) ?></div>
                     <?php if ($alreadyDl): ?>
