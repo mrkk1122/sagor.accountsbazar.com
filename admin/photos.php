@@ -9,7 +9,7 @@ $err = '';
 $currentAdminId = (int)($_SESSION['admin_id'] ?? 0);
 $preNotifyUserId = (int)($_GET['notify_user_id'] ?? 0);
 $preBookingId = (int)($_GET['booking_id'] ?? 0);
-$preTitle = $preBookingId > 0 ? ('Booking #' . $preBookingId . ' Photo') : '';
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -45,16 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             $err = $errors[$fileError] ?? ('আপলোড ত্রুটি #' . $fileError);
         } else {
-            $title = trim($_POST['title'] ?? '');
             $category = trim($_POST['category'] ?? 'general');
             $price = max(0, (float)($_POST['price'] ?? PHOTO_PRICE));
-            $is_free = isset($_POST['is_free']) ? 1 : 0;
+            $photo_type = ($_POST['photo_type'] ?? 'paid') === 'free' ? 'free' : 'paid';
+            $is_free = $photo_type === 'free' ? 1 : 0;
             $notify_user_id = (int)($_POST['notify_user_id'] ?? 0);
             $booking_id = (int)($_POST['booking_id'] ?? 0);
+            $title = $booking_id > 0 ? ('Booking #' . $booking_id . ' Photo') : ('Photo ' . date('Ymd-His'));
 
-            if (!$title) {
-                $err = 'শিরোনাম আবশ্যক।';
-            } else {
+            {
                 $allowed_mime = ['image/jpeg','image/png','image/gif','image/webp'];
                 $allowed_ext = ['jpg','jpeg','png','gif','webp'];
                 $ext = strtolower(pathinfo($_FILES['photo_file']['name'], PATHINFO_EXTENSION));
@@ -156,7 +155,6 @@ $usersForNotify = $db->query("SELECT id, name, email FROM users WHERE is_admin=0
     <h3>➕ নতুন ছবি আপলোড</h3>
     <form method="post" enctype="multipart/form-data">
         <div class="form-grid">
-            <div class="field"><label>শিরোনাম *</label><input type="text" name="title" value="<?= htmlspecialchars($preTitle) ?>" required placeholder="ছবির নাম"></div>
             <div class="field"><label>ক্যাটাগরি</label>
                 <select name="category">
                     <option value="general">সাধারণ</option>
@@ -170,6 +168,12 @@ $usersForNotify = $db->query("SELECT id, name, email FROM users WHERE is_admin=0
             </div>
             <div class="field"><label>মূল্য (৳)</label><input type="number" name="price" value="<?= PHOTO_PRICE ?>" min="0" step="1"></div>
             <div class="field"><label>ছবি ফাইল *</label><input type="file" name="photo_file" accept="image/jpeg,image/png,image/gif,image/webp" required></div>
+            <div class="field"><label>Photo Type</label>
+                <select name="photo_type">
+                    <option value="paid">Paid</option>
+                    <option value="free">Free</option>
+                </select>
+            </div>
             <div class="field"><label>ইউজার সিলেক্ট (ইমেইল নোটিফিকেশন)</label>
                 <select name="notify_user_id">
                     <option value="0">কাউকে পাঠাবেন না</option>
@@ -181,9 +185,6 @@ $usersForNotify = $db->query("SELECT id, name, email FROM users WHERE is_admin=0
             <input type="hidden" name="booking_id" value="<?= (int)$preBookingId ?>">
         </div>
         <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-size:.88rem;">
-                <input type="checkbox" name="is_free" value="1"> বিনামূল্যে ছবি হিসেবে চিহ্নিত করুন
-            </label>
             <button type="submit" class="btn btn-gold" style="margin-left:auto;">আপলোড করুন</button>
         </div>
     </form>

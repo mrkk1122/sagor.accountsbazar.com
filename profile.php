@@ -243,6 +243,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
                 $isFreeSlot = in_array($p['id'], $freePhotoIds, true);
                 $alreadyDl  = isset($downloaded[$p['id']]);
                 $isPaidPhoto = !($isFreeSlot || $p['is_free']);
+                $showPaidLookIcon = $isPaidPhoto && !$alreadyDl;
                 $photoPath  = 'uploads/photos/' . $p['filename'];
                 $hasFile    = file_exists(__DIR__ . '/' . $photoPath);
             ?>
@@ -253,7 +254,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
                     <?php else: ?>
                         <div class="ph-img-placeholder">📷</div>
                     <?php endif; ?>
-                    <?php if ($isPaidPhoto): ?>
+                    <?php if ($showPaidLookIcon): ?>
                         <span class="paid-look-icon" title="Paid Photo">👁</span>
                     <?php endif; ?>
                 </div>
@@ -264,9 +265,9 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
                     <?php elseif ($isFreeSlot || $p['is_free']): ?>
                         <a href="download.php?photo_id=<?= $p['id'] ?>" class="ph-action ph-free">বিনামূল্যে ডাউনলোড</a>
                     <?php elseif ($user['balance'] >= $p['price']): ?>
-                        <a href="download.php?photo_id=<?= $p['id'] ?>" class="ph-action ph-paid">৳<?= $p['price'] ?> ডাউনলোড</a>
+                        <a href="download.php?photo_id=<?= $p['id'] ?>" class="ph-action ph-paid">৳<?= $p['price'] ?> দিয়ে Unlock + Download</a>
                     <?php else: ?>
-                        <span class="ph-action ph-nobal">ব্যালেন্স অপর্যাপ্ত</span>
+                        <span class="ph-action ph-nobal">Locked • ৳<?= $p['price'] ?> লাগবে</span>
                     <?php endif; ?>
                 </div>
             </div>
