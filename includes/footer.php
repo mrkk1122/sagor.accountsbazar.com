@@ -4,14 +4,7 @@
             <span class="logo"><?= PHOTOGRAPHER_NAME ?> <span>Photography</span></span>
             <p>আপনার বিশেষ মুহূর্তগুলো আমাদের ক্যামেরায় চিরস্মরণীয় হয়ে থাকুক।</p>
         </div>
-        <div class="footer-links">
-            <h4>Quick Links</h4>
-            <a href="/#about">পরিচিতি</a>
-            <a href="/#services">সার্ভিস</a>
-            <a href="/booking.php">বুকিং</a>
-            <a href="/contact.php">যোগাযোগ</a>
-            <a href="/profile.php">প্রোফাইল</a>
-        </div>
+        <!-- Quick Links removed as per request -->
         <div class="footer-contact">
             <h4>যোগাযোগ</h4>
             <p>📞 <?= PHONE ?></p>
