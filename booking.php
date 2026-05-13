@@ -12,6 +12,24 @@ $__showHero = false;
 ?>
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
+<style>
+    .booking-confirm-modal{position:fixed;inset:0;z-index:1500;background:rgba(0,0,0,.82);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:14px;overflow-y:auto;}
+    .booking-confirm-modal.active{display:flex;}
+    .bcm-panel{width:min(520px,100%);background:linear-gradient(145deg,#11161d,#161d26);border:1px solid rgba(212,175,55,.35);border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.55);padding:32px 28px;text-align:center;animation:bcmIn .28s ease;}
+    @keyframes bcmIn{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
+    .bcm-icon{font-size:3.2rem;line-height:1;margin-bottom:14px;}
+    .bcm-title{font-size:1.45rem;font-weight:700;color:var(--white);margin-bottom:8px;}
+    .bcm-sub{font-size:.95rem;color:#c9d4e6;margin-bottom:20px;line-height:1.6;}
+    .bcm-details{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;text-align:left;margin-bottom:22px;}
+    .bcm-row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.88rem;}
+    .bcm-row:last-child{border-bottom:none;}
+    .bcm-row .bk{color:var(--muted);min-width:80px;flex-shrink:0;}
+    .bcm-row .bv{color:var(--light);font-weight:600;word-break:break-word;}
+    .bcm-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+    .bcm-actions .btn{min-width:140px;}
+    @media(max-width:480px){.bcm-panel{padding:22px 16px;}.bcm-title{font-size:1.2rem;}.bcm-actions .btn{width:100%;}}
+</style>
+
 <section id="booking">
     <div class="container">
         <div class="section-title">
@@ -22,8 +40,8 @@ $__showHero = false;
 
         <div class="booking-grid">
             <div class="booking-form-wrap">
-                <?php if ($bookingResult['message']): ?>
-                    <div class="alert <?= $bookingResult['success'] ? 'alert-success' : 'alert-error' ?>">
+                <?php if ($bookingResult['message'] && !$bookingResult['success']): ?>
+                    <div class="alert alert-error">
                         <?= $bookingResult['message'] ?>
                     </div>
                 <?php endif; ?>
@@ -124,6 +142,53 @@ $__showHero = false;
     </div>
 </section>
 
+<?php if ($bookingResult['success']): ?>
+<div class="booking-confirm-modal" id="booking-confirm-modal" aria-modal="true" role="dialog" aria-hidden="true">
+    <div class="bcm-panel">
+        <div class="bcm-icon">✅</div>
+        <div class="bcm-title">ধন্যবাদ <?= $bookingResult['booking_name'] ?>!</div>
+        <div class="bcm-sub">আপনার বুকিং অনুরোধ সফলভাবে গৃহীত হয়েছে।<br>শীঘ্রই <strong style="color:var(--gold);"><?= $bookingResult['admin_phone'] ?></strong> নম্বর থেকে আপনার <strong style="color:var(--gold);"><?= $bookingResult['booking_phone'] ?></strong> নম্বরে যোগাযোগ করা হবে।</div>
+        <div class="bcm-details">
+            <div class="bcm-row"><span class="bk">সার্ভিস</span><span class="bv"><?= $bookingResult['booking_service'] ?></span></div>
+            <div class="bcm-row"><span class="bk">তারিখ</span><span class="bv"><?= $bookingResult['booking_date'] ?></span></div>
+            <div class="bcm-row"><span class="bk">সময়</span><span class="bv"><?= $bookingResult['booking_time'] ?></span></div>
+            <?php if ($bookingResult['booking_details']): ?>
+            <div class="bcm-row"><span class="bk">বিস্তারিত</span><span class="bv"><?= $bookingResult['booking_details'] ?></span></div>
+            <?php endif; ?>
+            <div class="bcm-row"><span class="bk">ফোন</span><span class="bv"><?= $bookingResult['booking_phone'] ?></span></div>
+        </div>
+        <div class="bcm-actions">
+            <?php if ($bookingResult['whatsapp_url']): ?>
+            <a href="<?= htmlspecialchars($bookingResult['whatsapp_url'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" class="btn btn-gold">💬 WhatsApp-এ পাঠান</a>
+            <?php endif; ?>
+            <a href="/profile.php" class="btn btn-outline">প্রোফাইলে যান</a>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <button id="back-top" aria-label="Back to top">↑</button>
+
+<script>
+(function(){
+    var m = document.getElementById('booking-confirm-modal');
+    if (!m) return;
+    m.classList.add('active');
+    m.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    m.addEventListener('click', function(e){
+        if (e.target === m) {
+            m.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && m.classList.contains('active')) {
+            m.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+})();
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
