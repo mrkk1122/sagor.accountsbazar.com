@@ -7,7 +7,7 @@ $msg = '';
 $err = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
-    $fields = ['site_name','price_per_photo','free_photos_count','phone','whatsapp','email','location'];
+    $fields = ['site_name','price_per_photo','free_photos_count','phone','whatsapp','email','location','bkash_number','rocket_number','nagad_number'];
     foreach ($fields as $f) {
         $val = trim($_POST[$f] ?? '');
         upsert_setting($db, $f, $val);
@@ -16,9 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
 }
 
 // Load settings
-$keys = ['site_name','price_per_photo','free_photos_count','phone','whatsapp','email','location'];
+$keys = ['site_name','price_per_photo','free_photos_count','phone','whatsapp','email','location','bkash_number','rocket_number','nagad_number'];
 $s = [];
 foreach ($keys as $k) $s[$k] = get_setting($k);
+
+if ($s['bkash_number'] === '') $s['bkash_number'] = $s['phone'];
+if ($s['rocket_number'] === '') $s['rocket_number'] = $s['phone'];
+if ($s['nagad_number'] === '') $s['nagad_number'] = $s['phone'];
 ?>
 <?php if ($msg): ?><div class="alert alert-success"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
 <?php if ($err): ?><div class="alert alert-error"><?= htmlspecialchars($err) ?></div><?php endif; ?>
@@ -46,6 +50,18 @@ foreach ($keys as $k) $s[$k] = get_setting($k);
             <div class="field">
                 <label>WhatsApp নম্বর</label>
                 <input type="tel" name="whatsapp" value="<?= htmlspecialchars($s['whatsapp']) ?>">
+            </div>
+            <div class="field">
+                <label>bKash নম্বর</label>
+                <input type="tel" name="bkash_number" value="<?= htmlspecialchars($s['bkash_number']) ?>">
+            </div>
+            <div class="field">
+                <label>Rocket নম্বর</label>
+                <input type="tel" name="rocket_number" value="<?= htmlspecialchars($s['rocket_number']) ?>">
+            </div>
+            <div class="field">
+                <label>Nagad নম্বর</label>
+                <input type="tel" name="nagad_number" value="<?= htmlspecialchars($s['nagad_number']) ?>">
             </div>
             <div class="field">
                 <label>ইমেইল</label>

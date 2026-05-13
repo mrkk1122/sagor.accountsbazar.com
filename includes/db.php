@@ -368,6 +368,9 @@ function get_db(): PDO {
         'free_photos_count' => '2',
         'phone'             => '01XXXXXXXXX',
         'whatsapp'          => '01XXXXXXXXX',
+        'bkash_number'      => '01XXXXXXXXX',
+        'rocket_number'     => '01XXXXXXXXX',
+        'nagad_number'      => '01XXXXXXXXX',
         'email'             => 'booking@sagor.accountsbazar.com',
         'location'          => 'বাংলাদেশ',
     ];

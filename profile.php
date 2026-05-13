@@ -99,7 +99,10 @@ $downloaded = array_column($dlStmt->fetchAll(), null, 'photo_id'); // keyed by p
 $totalBookings   = count($bookings);
 $totalDownloads = count($downloaded);
 $photoCount     = count($photos);
-$adminPayNumber = get_setting('phone', PHONE);
+$defaultPayNumber = get_setting('phone', PHONE);
+$bkashPayNumber = get_setting('bkash_number', $defaultPayNumber);
+$rocketPayNumber = get_setting('rocket_number', $defaultPayNumber);
+$nagadPayNumber = get_setting('nagad_number', $defaultPayNumber);
 
 $rStmt = $db->prepare("SELECT * FROM balance_requests WHERE user_id=? ORDER BY created_at DESC LIMIT 20");
 $rStmt->execute([$user['id']]);
@@ -380,22 +383,22 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
                 <div class="pay-card">
                     <div class="m-name">bKash (বিকাশ)</div>
                     <div class="m-number">
-                        <span class="m-number-text">Admin: <?= htmlspecialchars($adminPayNumber) ?></span>
-                        <button type="button" class="copy-pay-number" data-copy-number="<?= htmlspecialchars($adminPayNumber, ENT_QUOTES, 'UTF-8') ?>" title="নাম্বার কপি করুন" aria-label="bKash নাম্বার কপি">📋</button>
+                        <span class="m-number-text">Admin: <?= htmlspecialchars($bkashPayNumber) ?></span>
+                        <button type="button" class="copy-pay-number" data-copy-number="<?= htmlspecialchars($bkashPayNumber, ENT_QUOTES, 'UTF-8') ?>" title="নাম্বার কপি করুন" aria-label="bKash নাম্বার কপি">📋</button>
                     </div>
                 </div>
                 <div class="pay-card">
                     <div class="m-name">Rocket (রকেট)</div>
                     <div class="m-number">
-                        <span class="m-number-text">Admin: <?= htmlspecialchars($adminPayNumber) ?></span>
-                        <button type="button" class="copy-pay-number" data-copy-number="<?= htmlspecialchars($adminPayNumber, ENT_QUOTES, 'UTF-8') ?>" title="নাম্বার কপি করুন" aria-label="Rocket নাম্বার কপি">📋</button>
+                        <span class="m-number-text">Admin: <?= htmlspecialchars($rocketPayNumber) ?></span>
+                        <button type="button" class="copy-pay-number" data-copy-number="<?= htmlspecialchars($rocketPayNumber, ENT_QUOTES, 'UTF-8') ?>" title="নাম্বার কপি করুন" aria-label="Rocket নাম্বার কপি">📋</button>
                     </div>
                 </div>
                 <div class="pay-card">
                     <div class="m-name">Nagad (নগদ)</div>
                     <div class="m-number">
-                        <span class="m-number-text">Admin: <?= htmlspecialchars($adminPayNumber) ?></span>
-                        <button type="button" class="copy-pay-number" data-copy-number="<?= htmlspecialchars($adminPayNumber, ENT_QUOTES, 'UTF-8') ?>" title="নাম্বার কপি করুন" aria-label="Nagad নাম্বার কপি">📋</button>
+                        <span class="m-number-text">Admin: <?= htmlspecialchars($nagadPayNumber) ?></span>
+                        <button type="button" class="copy-pay-number" data-copy-number="<?= htmlspecialchars($nagadPayNumber, ENT_QUOTES, 'UTF-8') ?>" title="নাম্বার কপি করুন" aria-label="Nagad নাম্বার কপি">📋</button>
                     </div>
                 </div>
             </div>
