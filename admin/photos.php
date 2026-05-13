@@ -27,54 +27,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $msg = 'ছবি মুছে ফেলা হয়েছে।';
         }
 
-    } elseif (isset($_FILES['photo_file']) && $_FILES['photo_file']['error'] === UPLOAD_ERR_OK) {
-        $title    = trim($_POST['title'] ?? '');
-        $category = trim($_POST['category'] ?? 'general');
-        $price    = max(0, (float)($_POST['price'] ?? PHOTO_PRICE));
-        $is_free  = isset($_POST['is_free']) ? 1 : 0;
-        $notify_user_id = (int)($_POST['notify_user_id'] ?? 0);
-        $booking_id = (int)($_POST['booking_id'] ?? 0);
-
-        if (!$title) {
-            $err = 'শিরোনাম আবশ্যক।';
+    } elseif (isset($_FILES['photo_file'])) {
+        // Handle file upload with detailed error checking
+        $fileError = $_FILES['photo_file']['error'];
+        
+        if ($fileError !== UPLOAD_ERR_OK) {
+            // Handle PHP upload errors
+            $errors = [
+                UPLOAD_ERR_INI_SIZE => 'ফাইল PHP সীমা অতিক্রম।',
+                UPLOAD_ERR_FORM_SIZE => 'ফাইল ফর্ম সীমা অতিক্রম।',
+                UPLOAD_ERR_PARTIAL => 'ফাইল আংশিক আপলোড।',
+                UPLOAD_ERR_NO_FILE => 'কোনো ফাইল নির্বাচিত নেই।',
+                UPLOAD_ERR_NO_TMP_DIR => 'টেম্প ডিরেক্টরি সমস্যা।',
+                UPLOAD_ERR_CANT_WRITE => 'ডিস্কে লিখতে ব্যর্থ।',
+                UPLOAD_ERR_EXTENSION => 'এক্সটেনশন ব্লক করা।'
+            ];
+            $err = $errors[$fileError] ?? ('আপলোড ত্রুটি #' . $fileError);
         } else {
-            $allowed_mime = ['image/jpeg','image/png','image/gif','image/webp'];
-            $allowed_ext  = ['jpg','jpeg','png','gif','webp'];
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime  = finfo_file($finfo, $_FILES['photo_file']['tmp_name']);
-            finfo_close($finfo);
-            $ext   = strtolower(pathinfo($_FILES['photo_file']['name'], PATHINFO_EXTENSION));
+            $title = trim($_POST['title'] ?? '');
+            $category = trim($_POST['category'] ?? 'general');
+            $price = max(0, (float)($_POST['price'] ?? PHOTO_PRICE));
+            $is_free = isset($_POST['is_free']) ? 1 : 0;
+            $notify_user_id = (int)($_POST['notify_user_id'] ?? 0);
+            $booking_id = (int)($_POST['booking_id'] ?? 0);
 
-            if (!in_array($mime, $allowed_mime, true) || !in_array($ext, $allowed_ext, true)) {
-                $err = 'শুধু JPG, PNG, GIF, WebP আপলোড করা যাবে।';
+            if (!$title) {
+                $err = 'শিরোনাম আবশ্যক।';
             } else {
-                $uploadDir = __DIR__ . '/../uploads/photos/';
-                if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-                $filename = bin2hex(random_bytes(12)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['photo_file']['tmp_name'], $uploadDir . $filename)) {
-                    $db->prepare("INSERT INTO photos (user_id, booking_id, title, filename, category, is_free, price) VALUES (?,?,?,?,?,?,?)")
-                       ->execute([$notify_user_id > 0 ? $notify_user_id : null, $booking_id > 0 ? $booking_id : null, $title, $filename, $category, $is_free, $price]);
-                    $msg = 'ছবি আপলোড হয়েছে।';
+                $allowed_mime = ['image/jpeg','image/png','image/gif','image/webp'];
+                $allowed_ext = ['jpg','jpeg','png','gif','webp'];
+                
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $_FILES['photo_file']['tmp_name']);
+                finfo_close($finfo);
+                $ext = strtolower(pathinfo($_FILES['photo_file']['name'], PATHINFO_EXTENSION));
 
-                    if ($notify_user_id > 0) {
-                        $uStmt = $db->prepare("SELECT name, email FROM users WHERE id=? AND is_admin=0 LIMIT 1");
-                        $uStmt->execute([$notify_user_id]);
-                        $targetUser = $uStmt->fetch();
-                        if ($targetUser && !empty($targetUser['email']) && filter_var($targetUser['email'], FILTER_VALIDATE_EMAIL)) {
-                            $safeUserName = htmlspecialchars($targetUser['name'], ENT_QUOTES, 'UTF-8');
-                            $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-                            $subject = 'নতুন ছবি আপলোড হয়েছে - ' . SITE_NAME;
-                            $html = '<h3>হ্যালো ' . $safeUserName . ',</h3>'
-                                  . '<p>আপনার জন্য নতুন একটি ছবি আপলোড করা হয়েছে।</p>'
-                                  . '<p><strong>ছবির শিরোনাম:</strong> ' . $safeTitle . '</p>'
-                                  . '<p>দেখতে ভিজিট করুন: <a href="https://sagor.accountsbazar.com/profile.php">প্রোফাইল</a></p>';
-                            $text = "আপনার জন্য নতুন ছবি আপলোড করা হয়েছে: {$title}. প্রোফাইল চেক করুন।";
-                            smtp_send_mail($targetUser['email'], $subject, $html, $text);
-                            $msg .= ' নির্বাচিত ইউজারের ইমেইলে নোটিফিকেশন পাঠানো হয়েছে।';
+                if (!in_array($mime, $allowed_mime, true) || !in_array($ext, $allowed_ext, true)) {
+                    $err = 'শুধু JPG, PNG, GIF, WebP গ্রহণযোগ্য।';
+                } else {
+                    $uploadDir = __DIR__ . '/../uploads/photos/';
+                    
+                    // Ensure directory exists with proper permissions
+                    if (!is_dir($uploadDir)) {
+                        if (!mkdir($uploadDir, 0777, true)) {
+                            $err = 'আপলোড ডিরেক্টরি তৈরি ব্যর্থ।';
                         }
                     }
-                } else {
-                    $err = 'আপলোড ব্যর্থ।';
+                    
+                    if (!$err && is_dir($uploadDir)) {
+                        $filename = bin2hex(random_bytes(12)) . '.' . $ext;
+                        $fullPath = $uploadDir . $filename;
+                        
+                        // Move uploaded file
+                        if (!move_uploaded_file($_FILES['photo_file']['tmp_name'], $fullPath)) {
+                            $err = 'ফাইল সংরক্ষণ ব্যর্থ। অনুমতি যাচাই করুন।';
+                        } else if (!file_exists($fullPath)) {
+                            $err = 'ফাইল সংরক্ষিত কিন্তু যাচাইকৃত নয়।';
+                        } else {
+                            // File exists, now try DB insert
+                            try {
+                                $stmt = $db->prepare("INSERT INTO photos (user_id, booking_id, title, filename, category, is_free, price) VALUES (?,?,?,?,?,?,?)");
+                                $success = $stmt->execute([
+                                    $notify_user_id > 0 ? $notify_user_id : null,
+                                    $booking_id > 0 ? $booking_id : null,
+                                    $title,
+                                    $filename,
+                                    $category,
+                                    $is_free,
+                                    $price
+                                ]);
+                                
+                                if (!$success) {
+                                    $err = 'ডাটাবেস ইনসার্ট ব্যর্থ।';
+                                    @unlink($fullPath);
+                                } else {
+                                    $msg = 'ছবি সফলভাবে আপলোড হয়েছে।';
+                                    
+                                    // Send notification if user selected
+                                    if ($notify_user_id > 0) {
+                                        $uStmt = $db->prepare("SELECT name, email FROM users WHERE id=? AND is_admin=0 LIMIT 1");
+                                        $uStmt->execute([$notify_user_id]);
+                                        $targetUser = $uStmt->fetch();
+                                        if ($targetUser && !empty($targetUser['email']) && filter_var($targetUser['email'], FILTER_VALIDATE_EMAIL)) {
+                                            $safeUserName = htmlspecialchars($targetUser['name'], ENT_QUOTES, 'UTF-8');
+                                            $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+                                            $subject = 'নতুন ছবি আপলোড হয়েছে - ' . SITE_NAME;
+                                            $html = '<h3>হ্যালো ' . $safeUserName . ',</h3>'
+                                                  . '<p>আপনার জন্য নতুন একটি ছবি আপলোড করা হয়েছে।</p>'
+                                                  . '<p><strong>ছবির শিরোনাম:</strong> ' . $safeTitle . '</p>'
+                                                  . '<p>দেখতে ভিজিট করুন: <a href="https://sagor.accountsbazar.com/profile.php">প্রোফাইল</a></p>';
+                                            $text = "আপনার জন্য নতুন ছবি আপলোড করা হয়েছে: {$title}. প্রোফাইল চেক করুন।";
+                                            smtp_send_mail($targetUser['email'], $subject, $html, $text);
+                                            $msg .= ' নির্বাচিত ইউজারের ইমেইলে নোটিফিকেশন পাঠানো হয়েছে।';
+                                        }
+                                    }
+                                }
+                            } catch (Exception $e) {
+                                $err = 'DB ত্রুটি: ' . $e->getMessage();
+                                @unlink($fullPath);
+                            }
+                        }
+                    }
                 }
             }
         }
