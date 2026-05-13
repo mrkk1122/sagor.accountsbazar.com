@@ -870,7 +870,7 @@ section { padding: 90px 0; }
 }
 
 @media (max-width: 768px) {
-    section { padding: 60px 0; }
+    section { padding: 52px 0; }
 
     body { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
 
@@ -885,12 +885,22 @@ section { padding: 90px 0; }
 
     .form-row { grid-template-columns: 1fr; }
 
-    .about-img img { height: 280px; }
+    .about-img img { height: 260px; }
+    .about-grid { gap: 28px; }
+
+    .hero-section { padding: 44px 0 28px; }
+    .hero-inner { gap: 18px; }
+    .hero-text p { font-size: 15px; }
+
+    .booking-form-wrap { padding: 20px 16px; }
+
+    .contact-hero { padding: 22px 0 8px; }
+    .contact-hero-inner { gap: 16px; }
 
     .footer-inner { grid-template-columns: 1fr; }
 
-    .pricing-card { padding: 34px 24px; }
-    .price-display .amount { font-size: 52px; }
+    .pricing-card { padding: 28px 20px; }
+    .price-display .amount { font-size: 50px; }
 
     .mobile-fixed-bar {
         position: fixed;
@@ -967,17 +977,21 @@ section { padding: 90px 0; }
 
 @media (max-width: 480px) {
     .container { width: min(1120px, 94%); }
-    .logo { font-size: 22px; }
-    .hero-text h1 { font-size: 32px; }
-    .hero-text p { font-size: 15px; }
+    section { padding: 38px 0; }
+    .logo { font-size: 20px; }
+    .hero-section { padding: 28px 0 16px; }
+    .hero-text h1 { font-size: 28px; }
+    .hero-text p { font-size: 14px; margin-bottom: 22px; }
     .hero-visual { width: 100%; }
-    .hero-photo-frame img { height: 280px; }
-    .contact-hero { padding: 26px 0 10px; }
-    .contact-hero-photo img { height: 250px; }
+    .hero-photo-frame img { height: 240px; }
+    .about-img img { height: 220px; }
+    .contact-hero { padding: 16px 0 6px; }
+    .contact-hero-photo img { height: 220px; }
     .hero-btns { flex-direction: column; }
     .btn { width: 100%; }
-    .stats-row { flex-direction: column; }
+    .stats-row { flex-direction: column; gap: 10px; }
     .schedule-grid { grid-template-columns: repeat(2, 1fr); }
+    .booking-form-wrap { padding: 16px 12px; }
 
     .mobile-fixed-bar {
         left: 8px;

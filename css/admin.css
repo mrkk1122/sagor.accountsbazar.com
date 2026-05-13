@@ -261,6 +261,7 @@ table.at tr:last-child td { border-bottom: none; }
     .admin-topbar h1 { font-size: .98rem; }
     .admin-content { padding: 12px; }
 
+    .table-card { overflow-x: auto; }
     .table-card-hdr { padding: 12px; }
     .form-card { padding: 14px; }
     .form-grid { grid-template-columns: 1fr; }
@@ -276,8 +277,9 @@ table.at tr:last-child td { border-bottom: none; }
     table.at th,
     table.at td { padding: 8px 10px; }
 
-    .btn { width: 100%; text-align: center; }
     .btn-sm { width: auto; }
+    .form-card .btn:not(.btn-sm) { width: 100%; text-align: center; }
+    .table-card-hdr .btn { width: auto; }
 }
 
 @media (max-width: 390px) {
