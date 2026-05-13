@@ -17,6 +17,16 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
 </head>
 <body>
 
+<!-- ===== WELCOME INSTALL MODAL ===== -->
+<div id="welcome-install-modal" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(13,17,23,.96);backdrop-filter:blur(2px);align-items:center;justify-content:center;">
+    <div style="background:var(--dark2,#141a2f);border-radius:18px;box-shadow:0 8px 32px #0008;padding:38px 28px 28px 28px;max-width:340px;width:90vw;text-align:center;">
+        <div style="font-size:2.2rem;margin-bottom:12px;">👋</div>
+        <h2 style="color:var(--gold);margin-bottom:10px;">স্বাগতম!</h2>
+        <p style="color:var(--light,#f0f6fc);margin-bottom:18px;">ওয়েবসাইট ব্যবহার করতে আগে অ্যাপ ইনস্টল করুন। ইনস্টল সম্পন্ন হলে হোমপেজ ওপেন হবে।</p>
+        <button id="welcome-install-btn" class="btn btn-gold" style="width:100%;font-size:1.1rem;">📱 ইনস্টল করুন</button>
+    </div>
+</div>
+
 <!-- ===== NAVBAR ===== -->
 <header id="top">
     <div class="navbar-wrap">
@@ -68,22 +78,54 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
         navigator.serviceWorker.register('/sw.js').catch(function(){});
     }
     var _prompt = null;
+    var installModal = document.getElementById('welcome-install-modal');
+    var installBtn = document.getElementById('welcome-install-btn');
+    var pwaBtn = document.getElementById('pwa-install-btn');
+    var installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    function openHomeAfterInstall() {
+        if (window.location.pathname !== '/') {
+            window.location.href = '/';
+            return;
+        }
+        window.location.reload();
+    }
+
     window.addEventListener('beforeinstallprompt', function(e) {
         e.preventDefault();
         _prompt = e;
-        var btn = document.getElementById('pwa-install-btn');
-        if (btn) btn.style.display = 'inline-flex';
+        if (pwaBtn) pwaBtn.style.display = 'inline-flex';
+        if (!installed && installModal) installModal.style.display = 'flex';
     });
+
     document.addEventListener('DOMContentLoaded', function() {
-        var btn = document.getElementById('pwa-install-btn');
-        if (btn) btn.addEventListener('click', function() {
+        if (!installed && installModal) installModal.style.display = 'flex';
+        if (installBtn) installBtn.onclick = function() {
+            if (_prompt) {
+                _prompt.prompt();
+                _prompt.userChoice.then(function(r) {
+                    if (r.outcome === 'accepted') {
+                        if (installModal) installModal.style.display = 'none';
+                        openHomeAfterInstall();
+                    }
+                });
+            } else {
+                alert('আপনার ব্রাউজারে ইনস্টল অপশন আসেনি। Chrome/Edge ব্যবহার করুন।');
+            }
+        };
+        if (pwaBtn) pwaBtn.addEventListener('click', function() {
             if (!_prompt) return;
             _prompt.prompt();
             _prompt.userChoice.then(function(r) {
-                if (r.outcome === 'accepted') btn.style.display = 'none';
+                if (r.outcome === 'accepted') pwaBtn.style.display = 'none';
                 _prompt = null;
             });
         });
+    });
+
+    window.addEventListener('appinstalled', function() {
+        if (installModal) installModal.style.display = 'none';
+        openHomeAfterInstall();
     });
 })();
 </script>
