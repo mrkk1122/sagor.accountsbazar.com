@@ -65,7 +65,7 @@ $__showHero = false;
                             <label for="phone">মোবাইল নম্বর *</label>
                             <input type="tel" id="phone" name="phone" required
                                 value="<?= htmlspecialchars($_POST['phone'] ?? ($user['phone'] ?? '')) ?>"
-                                placeholder="01XXXXXXXXX">
+                                placeholder="8801790088564">
                         </div>
                     </div>
 
@@ -95,7 +95,7 @@ $__showHero = false;
                             <input type="time" id="time" name="time" required value="<?= htmlspecialchars($_POST['time'] ?? '') ?>">
                         </div>
                         <div class="field">
-                            <label for="details">বিস্তারিত (ঐচ্ছিক)</label>
+                            <label for="details">বিস্তারিত </label>
                             <textarea id="details" name="details" placeholder="লোকেশন, বিশেষ চাহিদা, ইভেন্ট টাইপ ইত্যাদি লিখুন"><?= htmlspecialchars($_POST['details'] ?? '') ?></textarea>
                         </div>
                     </div>
@@ -130,13 +130,7 @@ $__showHero = false;
                     </p>
                 </div>
 
-                <div class="info-card">
-                    <h3>📞 যোগাযোগ</h3>
-                    <div class="info-row"><span class="key">ফোন</span><span class="val"><?= PHONE ?></span></div>
-                    <div class="info-row"><span class="key">WhatsApp</span><span class="val"><?= WHATSAPP ?></span></div>
-                    <div class="info-row"><span class="key">ইমেইল</span><span class="val"><?= EMAIL ?></span></div>
-                    <div class="info-row"><span class="key">লোকেশন</span><span class="val"><?= LOCATION ?></span></div>
-                </div>
+             
             </aside>
         </div>
     </div>
@@ -147,7 +141,7 @@ $__showHero = false;
     <div class="bcm-panel">
         <div class="bcm-icon">✅</div>
         <div class="bcm-title">ধন্যবাদ <?= $bookingResult['booking_name'] ?>!</div>
-        <div class="bcm-sub">আপনার বুকিং অনুরোধ সফলভাবে গৃহীত হয়েছে।<br>শীঘ্রই <strong style="color:var(--gold);"><?= $bookingResult['admin_phone'] ?></strong> নম্বর থেকে আপনার <strong style="color:var(--gold);"><?= $bookingResult['booking_phone'] ?></strong> নম্বরে যোগাযোগ করা হবে।</div>
+        <div class="bcm-sub">আপনার বুকিং অনুরোধ সফলভাবে গৃহীত হয়েছে।<br>শীঘ্রই <strong style="color:var(--gold);"><?= $bookingResult['admin_phone'] ?></strong> নম্বর থেকে আপনার <strong style="color:var(--gold);"><?= $bookingResult['booking_phone'] ?></strong> নম্বরে যোগাযোগ করা হবে।<br><span style="font-size:.82rem;color:var(--muted);margin-top:8px;display:block;">৪ সেকেন্ডে WhatsApp স্বয়ংক্রিয়ভাবে খুলবে...</span></div>
         <div class="bcm-details">
             <div class="bcm-row"><span class="bk">সার্ভিস</span><span class="bv"><?= $bookingResult['booking_service'] ?></span></div>
             <div class="bcm-row"><span class="bk">তারিখ</span><span class="bv"><?= $bookingResult['booking_date'] ?></span></div>
@@ -159,7 +153,7 @@ $__showHero = false;
         </div>
         <div class="bcm-actions">
             <?php if ($bookingResult['whatsapp_url']): ?>
-            <a href="<?= htmlspecialchars($bookingResult['whatsapp_url'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" class="btn btn-gold">💬 WhatsApp-এ পাঠান</a>
+            <a href="<?= htmlspecialchars($bookingResult['whatsapp_url'], ENT_QUOTES, 'UTF-8') ?>" id="bcm-whatsapp-btn" target="_blank" rel="noopener noreferrer" class="btn btn-gold">💬 WhatsApp-এ পাঠান</a>
             <?php endif; ?>
             <a href="/profile.php" class="btn btn-outline">প্রোফাইলে যান</a>
         </div>
@@ -176,18 +170,32 @@ $__showHero = false;
     m.classList.add('active');
     m.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+
+    var waBtnUrl = '';
+    var waBtn = document.getElementById('bcm-whatsapp-btn');
+    if (waBtn) {
+        waBtnUrl = waBtn.getAttribute('href');
+    }
+
+    function closeModal() {
+        m.classList.remove('active');
+        m.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
     m.addEventListener('click', function(e){
-        if (e.target === m) {
-            m.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+        if (e.target === m) closeModal();
     });
     document.addEventListener('keydown', function(e){
-        if (e.key === 'Escape' && m.classList.contains('active')) {
-            m.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+        if (e.key === 'Escape' && m.classList.contains('active')) closeModal();
     });
+
+    setTimeout(function(){
+        closeModal();
+        if (waBtnUrl) {
+            window.open(waBtnUrl, '_blank', 'noopener,noreferrer');
+        }
+    }, 4000);
 })();
 </script>
 
