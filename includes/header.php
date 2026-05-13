@@ -54,7 +54,7 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
             </div>
             <div class="hero-visual">
                 <div class="hero-photo-frame">
-                    <img src="https://www.facebook.com/photo/?fbid=1510949394070667&set=a.103015648197389" alt="Camera man with professional camera" loading="eager">
+                    <img src="https://scontent.fdac177-1.fna.fbcdn.net/v/t39.30808-6/600275462_1510949467403993_4294733459223387361_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeHx-N6Du_gK4b1xb6ZRldxTaGqclblDRDNoapyVuUNEMzK1XlEyyoRwmzlEOwGRYNygvl3PD-zIJvX91DAifWxL&_nc_ohc=bZ-VCLnd2n4Q7kNvwGKFcaf&_nc_oc=AdpdtY3e_kbZXmlmoTG4rFe_j20AHhbKu717HjHDeHaXoYxiP314V4EaSqRw5sdQuLs&_nc_zt=23&_nc_ht=scontent.fdac177-1.fna&_nc_gid=ZdKTOdPg1DH4aFpJdhrEqg&_nc_ss=7b2a8&oh=00_Af76V0KDcEbYDqvH_6SjzuIUiiKx80YTyKPuB3DI5gi8kQ&oe=6A099680" alt="Camera man with professional camera" style="display:block; margin-left:auto; margin-right:auto; max-width:420px; width:100%; border-radius:18px; box-shadow:0 4px 24px #0002;" loading="eager">
                 </div>
                 <span class="hero-float-badge">Live Shoot</span>
             </div>
