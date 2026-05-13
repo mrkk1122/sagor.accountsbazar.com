@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_help_request']))
             <p>প্রফেশনাল টিম, দ্রুত রেসপন্স এবং নির্ভরযোগ্য সাপোর্টের জন্য এখনই কল বা WhatsApp করুন।</p>
         </div>
         <div class="contact-hero-photo">
-            <img src="https://images.unsplash.com/photo-1520390138845-fd2d229dd553?auto=format&fit=crop&w=1400&q=80" alt="Cameraman with camera gear" loading="eager">
+            <img src="https://www.facebook.com/photo.php?fbid=2931369417202066&set=pb.100009871080964.-2207520000&type=3" alt="Cameraman with camera gear" loading="eager">
             <span class="contact-hero-badge">Camera Team Ready</span>
         </div>
     </div>

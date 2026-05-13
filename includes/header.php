@@ -54,7 +54,7 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
             </div>
             <div class="hero-visual">
                 <div class="hero-photo-frame">
-                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=900&q=80" alt="Camera man with professional camera" loading="eager">
+                    <img src="https://www.facebook.com/photo/?fbid=1510949394070667&set=a.103015648197389" alt="Camera man with professional camera" loading="eager">
                 </div>
                 <span class="hero-float-badge">Live Shoot</span>
             </div>

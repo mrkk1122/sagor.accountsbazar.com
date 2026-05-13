@@ -4,8 +4,8 @@ define('SITE_NAME', 'Sagor Photography');
 define('SITE_TAGLINE', 'প্রফেশনাল ফটোগ্রাফি সার্ভিস');
 define('PHOTOGRAPHER_NAME', 'Sagor');
 define('PRICE_PER_PHOTO', '১০');
-define('PHONE', '01XXXXXXXXX');
-define('WHATSAPP', '01XXXXXXXXX');
+define('PHONE', '01790088564');
+define('WHATSAPP', '01790088564');
 define('EMAIL', 'booking@sagor.accountsbazar.com');
 define('LOCATION', 'বাংলাদেশ');
 
