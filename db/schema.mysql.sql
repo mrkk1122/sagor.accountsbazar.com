@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(191) NOT NULL,
     phone VARCHAR(30) NOT NULL,
     email VARCHAR(191) NOT NULL DEFAULT '',
+    profile_photo VARCHAR(255) NOT NULL DEFAULT '',
     password VARCHAR(255) NOT NULL,
     balance DECIMAL(12,2) NOT NULL DEFAULT 0,
     is_admin TINYINT(1) NOT NULL DEFAULT 0,

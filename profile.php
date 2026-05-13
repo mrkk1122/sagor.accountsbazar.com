@@ -9,6 +9,56 @@ $db   = get_db();
 $msg  = '';
 $err  = '';
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_profile_photo'])) {
+    if (!isset($_FILES['profile_photo']) || (int)$_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
+        $err = 'প্রোফাইল ছবি আপলোড ব্যর্থ হয়েছে।';
+    } else {
+        $allowedExt = ['jpg', 'jpeg', 'png', 'webp'];
+        $ext = strtolower(pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION));
+
+        $mime = '';
+        if (function_exists('finfo_open')) {
+            $finfo = @finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo) {
+                $mime = (string)@finfo_file($finfo, $_FILES['profile_photo']['tmp_name']);
+                @finfo_close($finfo);
+            }
+        }
+        $allowedMime = ['image/jpeg', 'image/png', 'image/webp'];
+        $mimeOk = ($mime === '') ? true : in_array($mime, $allowedMime, true);
+
+        if (!in_array($ext, $allowedExt, true) || !$mimeOk) {
+            $err = 'শুধু JPG, PNG, WebP ছবি আপলোড করা যাবে।';
+        } else {
+            $avatarDir = __DIR__ . '/uploads/avatars/';
+            if (!is_dir($avatarDir)) {
+                @mkdir($avatarDir, 0755, true);
+            }
+
+            if (!is_dir($avatarDir)) {
+                $err = 'Avatar ফোল্ডার তৈরি করা যায়নি।';
+            } else {
+                $newFile = 'u' . (int)$user['id'] . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+                $targetPath = $avatarDir . $newFile;
+                if (!move_uploaded_file($_FILES['profile_photo']['tmp_name'], $targetPath)) {
+                    $err = 'ছবি সংরক্ষণ করা যায়নি।';
+                } else {
+                    $oldFile = trim((string)($user['profile_photo'] ?? ''));
+                    $db->prepare("UPDATE users SET profile_photo=? WHERE id=?")->execute([$newFile, $user['id']]);
+                    if ($oldFile !== '' && preg_match('/^[a-zA-Z0-9_.-]+$/', $oldFile)) {
+                        $oldPath = $avatarDir . $oldFile;
+                        if (is_file($oldPath)) {
+                            @unlink($oldPath);
+                        }
+                    }
+                    $user['profile_photo'] = $newFile;
+                    $msg = 'প্রোফাইল ছবি আপডেট হয়েছে।';
+                }
+            }
+        }
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_balance_request'])) {
     $amount = (float)($_POST['amount'] ?? 0);
     $note = trim($_POST['note'] ?? '');
@@ -78,7 +128,10 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .profile-topbar-right{display:flex;gap:12px;align-items:center;}
         .profile-user{color:var(--muted);font-size:.88rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .profile-header{background:linear-gradient(120deg,rgba(22,27,34,.98),rgba(28,33,40,.96));border:1px solid rgba(212,175,55,.28);border-radius:18px;padding:30px 32px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;box-shadow:0 14px 30px rgba(0,0,0,.24);}
-        .avatar{width:70px;height:70px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:var(--dark);flex-shrink:0;}
+        .avatar{width:120px;height:120px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:2.8rem;font-weight:700;color:var(--dark);flex-shrink:0;overflow:hidden;border:2px solid rgba(212,175,55,.35);box-shadow:0 10px 20px rgba(0,0,0,.25);}
+        .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+        .avatar-upload{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+        .avatar-upload input[type="file"]{max-width:230px;font-size:.78rem;color:var(--muted);}
         .profile-info h2{margin:0 0 4px;color:var(--white);font-size:1.4rem;}
         .profile-info p{margin:0;color:var(--muted);font-size:.88rem;}
         .profile-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
@@ -154,7 +207,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         @media (max-width:480px){
             .profile-kpis{grid-template-columns:1fr;}
             .photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-            .avatar{width:58px;height:58px;font-size:1.6rem;}
+            .avatar{width:84px;height:84px;font-size:2rem;}
             .balance-badge .amt{font-size:1.5rem;}
             .meta-pill{font-size:.74rem;padding:5px 8px;}
             .photo-card .paid-look-icon{width:44px;height:44px;font-size:1.35rem;}
@@ -179,7 +232,24 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
 
     <!-- Profile Header -->
     <div class="profile-header">
-        <div class="avatar"><?= mb_substr($user['name'], 0, 1) ?></div>
+        <div>
+            <div class="avatar">
+                <?php
+                    $avatarFile = trim((string)($user['profile_photo'] ?? ''));
+                    $avatarRelPath = $avatarFile !== '' ? ('uploads/avatars/' . $avatarFile) : '';
+                    $avatarAbsPath = $avatarRelPath !== '' ? (__DIR__ . '/' . $avatarRelPath) : '';
+                ?>
+                <?php if ($avatarRelPath !== '' && is_file($avatarAbsPath)): ?>
+                    <img src="<?= htmlspecialchars($avatarRelPath) ?>" alt="<?= htmlspecialchars($user['name']) ?>">
+                <?php else: ?>
+                    <?= mb_substr($user['name'], 0, 1) ?>
+                <?php endif; ?>
+            </div>
+            <form method="post" enctype="multipart/form-data" class="avatar-upload">
+                <input type="file" name="profile_photo" accept="image/jpeg,image/png,image/webp" required>
+                <button type="submit" name="submit_profile_photo" class="btn btn-outline" style="padding:6px 12px;font-size:.78rem;">ছবি আপলোড</button>
+            </form>
+        </div>
         <div class="profile-info">
             <h2><?= htmlspecialchars($user['name']) ?></h2>
             <div class="profile-meta">

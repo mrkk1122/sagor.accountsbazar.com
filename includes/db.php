@@ -13,6 +13,7 @@ function init_sqlite_schema(PDO $pdo): void {
         name TEXT NOT NULL,
         phone TEXT NOT NULL UNIQUE,
         email TEXT DEFAULT '',
+        profile_photo TEXT DEFAULT '',
         password TEXT NOT NULL,
         balance REAL DEFAULT 0 CHECK (balance >= 0),
         is_admin INTEGER DEFAULT 0 CHECK (is_admin IN (0, 1)),
@@ -114,6 +115,7 @@ function init_mysql_schema(PDO $pdo): void {
         name VARCHAR(191) NOT NULL,
         phone VARCHAR(30) NOT NULL,
         email VARCHAR(191) NOT NULL DEFAULT '',
+        profile_photo VARCHAR(255) NOT NULL DEFAULT '',
         password VARCHAR(255) NOT NULL,
         balance DECIMAL(12,2) NOT NULL DEFAULT 0,
         is_admin TINYINT(1) NOT NULL DEFAULT 0,
@@ -260,6 +262,37 @@ function ensure_photos_columns(PDO $pdo): void {
     }
 }
 
+function ensure_users_profile_photo_column(PDO $pdo): void {
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+    try {
+        if ($driver === 'mysql') {
+            $dbName = (string)$pdo->query('SELECT DATABASE()')->fetchColumn();
+            if ($dbName === '') {
+                return;
+            }
+
+            $check = $pdo->prepare("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='users' AND COLUMN_NAME='profile_photo'");
+            $check->execute([$dbName]);
+            if ((int)$check->fetchColumn() === 0) {
+                $pdo->exec("ALTER TABLE users ADD COLUMN profile_photo VARCHAR(255) NOT NULL DEFAULT ''");
+            }
+        } else {
+            $cols = [];
+            $rows = $pdo->query("PRAGMA table_info(users)")->fetchAll();
+            foreach ($rows as $r) {
+                $cols[$r['name']] = true;
+            }
+
+            if (!isset($cols['profile_photo'])) {
+                $pdo->exec("ALTER TABLE users ADD COLUMN profile_photo TEXT DEFAULT ''");
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('[DB] ensure_users_profile_photo_column failed: ' . $e->getMessage());
+    }
+}
+
 function upsert_setting(PDO $pdo, string $key, string $value): void {
     $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     if ($driver === 'mysql') {
@@ -294,6 +327,7 @@ function get_db(): PDO {
             ]);
             init_mysql_schema($pdo);
             ensure_photos_columns($pdo);
+            ensure_users_profile_photo_column($pdo);
         } catch (Throwable $e) {
             $mysqlError = $e->getMessage();
             error_log('[DB] MySQL failed, trying SQLite fallback: ' . $mysqlError);
@@ -310,6 +344,7 @@ function get_db(): PDO {
             $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             init_sqlite_schema($pdo);
             ensure_photos_columns($pdo);
+            ensure_users_profile_photo_column($pdo);
         } catch (Throwable $e) {
             // Both MySQL and SQLite failed — show a safe error page
             $reason = $mysqlError ?? $e->getMessage();

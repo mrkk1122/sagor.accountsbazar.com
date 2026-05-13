@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     name TEXT NOT NULL,
     phone TEXT NOT NULL UNIQUE,
     email TEXT DEFAULT '',
+    profile_photo TEXT DEFAULT '',
     password TEXT NOT NULL,
     balance REAL DEFAULT 0 CHECK (balance >= 0),
     is_admin INTEGER DEFAULT 0 CHECK (is_admin IN (0, 1)),
