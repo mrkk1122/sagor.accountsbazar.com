@@ -30,9 +30,14 @@ $bStmt->execute([$user['id']]);
 $bookings = $bStmt->fetchAll();
 
 // Photos - show only photos uploaded for this user or their bookings
-$pStmt = $db->prepare("SELECT * FROM photos WHERE user_id=? OR booking_id IN (SELECT id FROM bookings WHERE user_id=?) ORDER BY created_at ASC");
-$pStmt->execute([$user['id'], $user['id']]);
-$photos = $pStmt->fetchAll();
+try {
+    $pStmt = $db->prepare("SELECT * FROM photos WHERE user_id=? OR booking_id IN (SELECT id FROM bookings WHERE user_id=?) ORDER BY created_at ASC");
+    $pStmt->execute([$user['id'], $user['id']]);
+    $photos = $pStmt->fetchAll();
+} catch (Throwable $e) {
+    // Fallback for legacy schema; migration runs in includes/db.php
+    $photos = $db->query("SELECT * FROM photos ORDER BY created_at ASC")->fetchAll();
+}
 
 // Build free-slot IDs from DB order (mirrors download.php logic exactly)
 $freeCount   = (int)get_setting('free_photos_count', (string)FREE_PHOTOS_COUNT);

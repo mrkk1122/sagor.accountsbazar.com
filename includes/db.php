@@ -220,6 +220,46 @@ function init_mysql_schema(PDO $pdo): void {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
+function ensure_photos_columns(PDO $pdo): void {
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+    try {
+        if ($driver === 'mysql') {
+            $dbName = (string)$pdo->query('SELECT DATABASE()')->fetchColumn();
+            if ($dbName === '') {
+                return;
+            }
+
+            $check = $pdo->prepare("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='photos' AND COLUMN_NAME=?");
+
+            $check->execute([$dbName, 'user_id']);
+            if ((int)$check->fetchColumn() === 0) {
+                $pdo->exec("ALTER TABLE photos ADD COLUMN user_id BIGINT UNSIGNED NULL");
+            }
+
+            $check->execute([$dbName, 'booking_id']);
+            if ((int)$check->fetchColumn() === 0) {
+                $pdo->exec("ALTER TABLE photos ADD COLUMN booking_id BIGINT UNSIGNED NULL");
+            }
+        } else {
+            $cols = [];
+            $rows = $pdo->query("PRAGMA table_info(photos)")->fetchAll();
+            foreach ($rows as $r) {
+                $cols[$r['name']] = true;
+            }
+
+            if (!isset($cols['user_id'])) {
+                $pdo->exec("ALTER TABLE photos ADD COLUMN user_id INTEGER");
+            }
+            if (!isset($cols['booking_id'])) {
+                $pdo->exec("ALTER TABLE photos ADD COLUMN booking_id INTEGER");
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('[DB] ensure_photos_columns failed: ' . $e->getMessage());
+    }
+}
+
 function upsert_setting(PDO $pdo, string $key, string $value): void {
     $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     if ($driver === 'mysql') {
@@ -253,6 +293,7 @@ function get_db(): PDO {
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ]);
             init_mysql_schema($pdo);
+            ensure_photos_columns($pdo);
         } catch (Throwable $e) {
             $mysqlError = $e->getMessage();
             error_log('[DB] MySQL failed, trying SQLite fallback: ' . $mysqlError);
@@ -268,6 +309,7 @@ function get_db(): PDO {
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             init_sqlite_schema($pdo);
+            ensure_photos_columns($pdo);
         } catch (Throwable $e) {
             // Both MySQL and SQLite failed — show a safe error page
             $reason = $mysqlError ?? $e->getMessage();
