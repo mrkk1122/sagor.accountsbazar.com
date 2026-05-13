@@ -129,13 +129,13 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .profile-user{color:var(--muted);font-size:.88rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .profile-header{background:linear-gradient(120deg,rgba(22,27,34,.98),rgba(28,33,40,.96));border:1px solid rgba(212,175,55,.28);border-radius:18px;padding:30px 32px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;box-shadow:0 14px 30px rgba(0,0,0,.24);}
         .avatar-wrap{position:relative;display:inline-block;}
-        .avatar{width:160px;height:160px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:3.2rem;font-weight:700;color:var(--dark);flex-shrink:0;overflow:hidden;border:2px solid rgba(212,175,55,.35);box-shadow:0 10px 20px rgba(0,0,0,.25);}
+        .avatar{width:190px;height:190px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:3.6rem;font-weight:700;color:var(--dark);flex-shrink:0;overflow:hidden;border:2px solid rgba(212,175,55,.35);box-shadow:0 10px 20px rgba(0,0,0,.25);}
         .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
         .avatar-upload{position:absolute;top:6px;right:6px;z-index:3;}
         .avatar-upload input[type="file"]{display:none;}
         .avatar-upload-btn{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.75);color:#fff;cursor:pointer;font-size:.72rem;line-height:1;}
         .avatar-upload-btn:hover{border-color:rgba(212,175,55,.9);color:var(--gold);}
-        .profile-info h2{margin:0 0 4px;color:var(--white);font-size:1.4rem;}
+        .profile-info h2{margin:0 0 4px;color:var(--white);font-size:1.85rem;}
         .profile-info p{margin:0;color:var(--muted);font-size:.88rem;}
         .profile-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
         .meta-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:.8rem;color:var(--light);}
@@ -195,7 +195,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
             .profile-topbar-right{margin-left:auto;}
             .profile-user{display:none;}
             .profile-header{padding:20px 16px;gap:14px;}
-            .profile-info h2{font-size:1.15rem;}
+            .profile-info h2{font-size:1.35rem;}
             .balance-badge{width:100%;margin-left:0;}
             .balance-action .btn{max-width:none;}
             .sec-card{padding:16px;}
@@ -210,7 +210,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         @media (max-width:480px){
             .profile-kpis{grid-template-columns:1fr;}
             .photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-            .avatar{width:108px;height:108px;font-size:2.2rem;}
+            .avatar{width:132px;height:132px;font-size:2.55rem;}
             .balance-badge .amt{font-size:1.5rem;}
             .meta-pill{font-size:.74rem;padding:5px 8px;}
             .photo-card .paid-look-icon{width:44px;height:44px;font-size:1.35rem;}
