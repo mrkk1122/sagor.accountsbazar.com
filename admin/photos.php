@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fileError = $_FILES['photo_file']['error'];
         
         if ($fileError !== UPLOAD_ERR_OK) {
-            $maxUploadSize = ini_get('upload_max_filesize');
+            $maxUploadSize = '92M';
             // Handle PHP upload errors
             $errors = [
                 UPLOAD_ERR_INI_SIZE => 'ফাইল PHP সীমা অতিক্রম। সর্বোচ্চ: ' . $maxUploadSize,

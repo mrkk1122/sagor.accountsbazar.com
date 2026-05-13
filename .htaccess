@@ -24,3 +24,10 @@ Options -Indexes
 
 # Charset
 AddDefaultCharset UTF-8
+
+# PHP upload limits (XAMPP/mod_php)
+php_value upload_max_filesize 92M
+php_value post_max_size 100M
+php_value max_execution_time 120
+php_value max_input_time 120
+php_value memory_limit 256M
