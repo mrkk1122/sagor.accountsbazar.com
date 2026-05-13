@@ -62,7 +62,7 @@ $statusName = ['pending' => 'অপেক্ষমান', 'confirmed' => 'ক�
 
 <div class="table-card">
     <div class="table-card-hdr"><h3>ব্যালেন্স রিকোয়েস্ট (<?= count($requests) ?>)</h3></div>
-    <div style="overflow-x:auto;">
+    <div class="table-scroll">
     <table class="at">
         <thead>
             <tr>
@@ -86,9 +86,9 @@ $statusName = ['pending' => 'অপেক্ষমান', 'confirmed' => 'ক�
                 <td><span class="badge <?= $statusClass[$r['status']] ?? '' ?>"><?= $statusName[$r['status']] ?? $r['status'] ?></span></td>
                 <td>
                     <?php if ($r['status'] === 'pending'): ?>
-                        <form method="post" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                        <form method="post" class="inline-form">
                             <input type="hidden" name="request_id" value="<?= (int)$r['id'] ?>">
-                            <input type="text" name="admin_note" placeholder="admin note" style="min-width:140px;background:var(--dark3);color:var(--light);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 8px;font-size:.8rem;">
+                            <input type="text" name="admin_note" placeholder="admin note" class="inline-note-input">
                             <button type="submit" name="action" value="confirm" class="btn btn-gold btn-sm">কনফার্ম</button>
                             <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">বাতিল</button>
                         </form>

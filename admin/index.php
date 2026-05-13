@@ -28,7 +28,7 @@ $sn = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চি
         <h3>সাম্প্রতিক বুকিং</h3>
         <a href="bookings.php" class="btn btn-outline btn-sm">সব দেখুন</a>
     </div>
-    <div style="overflow-x:auto;">
+    <div class="table-scroll">
     <table class="at">
         <thead><tr><th>#</th><th>ইউজার</th><th>ফোন</th><th>সার্ভিস</th><th>তারিখ</th><th>স্ট্যাটাস</th></tr></thead>
         <tbody>

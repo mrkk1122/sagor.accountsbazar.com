@@ -36,7 +36,7 @@ $users = $db->query(
 
 <div class="table-card">
     <div class="table-card-hdr"><h3>সকল ইউজার (<?= count($users) ?>)</h3></div>
-    <div style="overflow-x:auto;">
+    <div class="table-scroll">
     <table class="at">
         <thead><tr><th>#</th><th>নাম</th><th>ফোন</th><th>ইমেইল</th><th>ব্যালেন্স</th><th>বুকিং</th><th>ধরন</th><th>যোগদান</th><th>অ্যাকশন</th></tr></thead>
         <tbody>
@@ -50,12 +50,12 @@ $users = $db->query(
             <td><?= $u['bcount'] ?></td>
             <td><?= $u['is_admin'] ? '<span class="badge b-admin">অ্যাডমিন</span>' : '<span class="badge b-confirmed">ইউজার</span>' ?></td>
             <td style="font-size:.8rem;color:var(--muted);"><?= htmlspecialchars(substr($u['created_at'], 0, 10)) ?></td>
-            <td style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <td class="cell-actions">
                 <?php if (!$u['is_admin']): ?>
                 <!-- Add Balance -->
-                <form method="post" style="display:flex;gap:4px;align-items:center;">
+                <form method="post" class="inline-form inline-form-compact">
                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                    <input type="number" name="amount" min="1" step="1" placeholder="৳" style="width:70px;background:var(--dark3);color:var(--light);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 8px;font-size:.8rem;">
+                    <input type="number" name="amount" min="1" step="1" placeholder="৳" class="inline-input">
                     <button type="submit" name="add_balance" class="btn btn-gold btn-sm">যোগ করুন</button>
                 </form>
                 <!-- Delete -->

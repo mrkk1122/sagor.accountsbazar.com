@@ -40,7 +40,7 @@ $sn = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চি
 
 <div class="table-card">
     <div class="table-card-hdr"><h3>সকল বুকিং (<?= count($bookings) ?>)</h3></div>
-    <div style="overflow-x:auto;">
+    <div class="table-scroll">
     <table class="at">
         <thead><tr><th>#</th><th>ইউজার</th><th>ফোন</th><th>সার্ভিস</th><th>তারিখ</th><th>সময়</th><th>বিস্তারিত</th><th>স্ট্যাটাস</th><th>পরিবর্তন</th><th>ক্লায়েন্ট ছবি</th></tr></thead>
         <tbody>
@@ -55,9 +55,9 @@ $sn = ['pending'=>'অপেক্ষমান','confirmed'=>'নিশ্চি
             <td style="font-size:.8rem;color:var(--muted);"><?= htmlspecialchars(substr($b['details'] ?: '-', 0, 50)) ?></td>
             <td><span class="badge <?= $sl[$b['status']] ?? '' ?>"><?= $sn[$b['status']] ?? $b['status'] ?></span></td>
             <td>
-                <form method="post" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <form method="post" class="inline-form">
                     <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
-                    <select name="status" style="background:var(--dark3);color:var(--light);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 8px;font-size:.8rem;">
+                    <select name="status" class="inline-select">
                         <?php foreach ($sn as $sv => $sl2): ?>
                             <option value="<?= $sv ?>" <?= $b['status']===$sv ? 'selected':'' ?>><?= $sl2 ?></option>
                         <?php endforeach; ?>

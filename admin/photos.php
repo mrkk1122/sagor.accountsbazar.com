@@ -192,7 +192,7 @@ $usersForNotify = $db->query("SELECT id, name, email FROM users WHERE is_admin=0
 
 <div class="table-card">
     <div class="table-card-hdr"><h3>সকল ছবি (<?= count($photos) ?>)</h3></div>
-    <div style="overflow-x:auto;">
+    <div class="table-scroll">
     <table class="at">
         <thead><tr><th>থাম্ব</th><th>শিরোনাম</th><th>ক্যাটাগরি</th><th>মূল্য</th><th>বিনামূল্যে</th><th>আপলোড</th><th>অ্যাকশন</th></tr></thead>
         <tbody>
