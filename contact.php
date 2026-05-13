@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_help_request']))
             <p>প্রফেশনাল টিম, দ্রুত রেসপন্স এবং নির্ভরযোগ্য সাপোর্টের জন্য এখনই কল বা WhatsApp করুন।</p>
         </div>
         <div class="contact-hero-photo">
-            <img src="https://www.facebook.com/photo.php?fbid=2931369417202066&set=pb.100009871080964.-2207520000&type=3" alt="Cameraman with camera gear" loading="eager">
+            <img src="https://scontent.fdac177-2.fna.fbcdn.net/v/t39.30808-6/672689394_2931369430535398_6126606788332305765_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeGzFGWqRB9eh-NFugdpDqbA0K8L37UBWjPQrwvftQFaM2MVUoroHrposOmBI_Ec8638qHLsVjEgZvrqDaTYIY_b&_nc_ohc=gOUjVpkJKbcQ7kNvwGxgy_d&_nc_oc=AdpauyKEZBoFCji-baZVE91W1EtCjHeJ0mocYujV5eFmMVa-aJxGzLEHwVpWddAD6L8&_nc_zt=23&_nc_ht=scontent.fdac177-2.fna&_nc_gid=EiECtisFV9iY_ou2oiK3-g&_nc_ss=7b2a8&oh=00_Af4fl04lUMdTgyMcgb0eErrVl_3XdeoCp9_E2_4hT_Mgkw&oe=6A098CC6" alt="Cameraman with camera gear" style="display:block; margin-left:auto; margin-right:auto; max-width:320px; width:100%; border-radius:12px; box-shadow:0 4px 24px #0002;" loading="eager">
             <span class="contact-hero-badge">Camera Team Ready</span>
         </div>
     </div>
