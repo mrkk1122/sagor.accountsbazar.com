@@ -128,10 +128,13 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .profile-topbar-right{display:flex;gap:12px;align-items:center;}
         .profile-user{color:var(--muted);font-size:.88rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .profile-header{background:linear-gradient(120deg,rgba(22,27,34,.98),rgba(28,33,40,.96));border:1px solid rgba(212,175,55,.28);border-radius:18px;padding:30px 32px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;box-shadow:0 14px 30px rgba(0,0,0,.24);}
-        .avatar{width:120px;height:120px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:2.8rem;font-weight:700;color:var(--dark);flex-shrink:0;overflow:hidden;border:2px solid rgba(212,175,55,.35);box-shadow:0 10px 20px rgba(0,0,0,.25);}
+        .avatar-wrap{position:relative;display:inline-block;}
+        .avatar{width:160px;height:160px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:3.2rem;font-weight:700;color:var(--dark);flex-shrink:0;overflow:hidden;border:2px solid rgba(212,175,55,.35);box-shadow:0 10px 20px rgba(0,0,0,.25);}
         .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-        .avatar-upload{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-        .avatar-upload input[type="file"]{max-width:230px;font-size:.78rem;color:var(--muted);}
+        .avatar-upload{position:absolute;top:6px;right:6px;z-index:3;}
+        .avatar-upload input[type="file"]{display:none;}
+        .avatar-upload-btn{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.75);color:#fff;cursor:pointer;font-size:.72rem;line-height:1;}
+        .avatar-upload-btn:hover{border-color:rgba(212,175,55,.9);color:var(--gold);}
         .profile-info h2{margin:0 0 4px;color:var(--white);font-size:1.4rem;}
         .profile-info p{margin:0;color:var(--muted);font-size:.88rem;}
         .profile-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
@@ -207,10 +210,11 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         @media (max-width:480px){
             .profile-kpis{grid-template-columns:1fr;}
             .photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-            .avatar{width:84px;height:84px;font-size:2rem;}
+            .avatar{width:108px;height:108px;font-size:2.2rem;}
             .balance-badge .amt{font-size:1.5rem;}
             .meta-pill{font-size:.74rem;padding:5px 8px;}
             .photo-card .paid-look-icon{width:44px;height:44px;font-size:1.35rem;}
+            .avatar-upload-btn{width:22px;height:22px;font-size:.65rem;}
         }
     </style>
 </head>
@@ -233,6 +237,7 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     <!-- Profile Header -->
     <div class="profile-header">
         <div>
+            <div class="avatar-wrap">
             <div class="avatar">
                 <?php
                     $avatarFile = trim((string)($user['profile_photo'] ?? ''));
@@ -246,9 +251,12 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
                 <?php endif; ?>
             </div>
             <form method="post" enctype="multipart/form-data" class="avatar-upload">
-                <input type="file" name="profile_photo" accept="image/jpeg,image/png,image/webp" required>
-                <button type="submit" name="submit_profile_photo" class="btn btn-outline" style="padding:6px 12px;font-size:.78rem;">ছবি আপলোড</button>
+                <label class="avatar-upload-btn" title="ছবি আপলোড">
+                    ⬆
+                    <input type="file" id="profile-photo-input" name="profile_photo" accept="image/jpeg,image/png,image/webp" required>
+                </label>
             </form>
+            </div>
         </div>
         <div class="profile-info">
             <h2><?= htmlspecialchars($user['name']) ?></h2>
@@ -507,6 +515,15 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
     if (photoPreviewModal) {
         photoPreviewModal.addEventListener('click', function(e){
             if (e.target === photoPreviewModal) closePhotoPreview();
+        });
+    }
+
+    var profilePhotoInput = document.getElementById('profile-photo-input');
+    if (profilePhotoInput) {
+        profilePhotoInput.addEventListener('change', function(){
+            if (!profilePhotoInput.files || !profilePhotoInput.files.length) return;
+            var uploadForm = profilePhotoInput.closest('form');
+            if (uploadForm) uploadForm.submit();
         });
     }
 
