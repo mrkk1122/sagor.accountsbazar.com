@@ -183,7 +183,11 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
         .pay-methods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
         .pay-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;}
         .pay-card .m-name{font-size:.86rem;color:var(--gold);font-weight:700;margin-bottom:4px;}
-        .pay-card .m-number{font-size:.9rem;color:var(--light);font-weight:600;word-break:break-word;}
+        .pay-card .m-number{font-size:.9rem;color:var(--light);font-weight:600;word-break:break-word;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+        .pay-card .m-number-text{min-width:0;overflow-wrap:anywhere;}
+        .copy-pay-number{width:24px;height:24px;flex-shrink:0;border-radius:7px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:var(--light);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:.78rem;line-height:1;}
+        .copy-pay-number:hover{border-color:rgba(212,175,55,.55);color:var(--gold);background:rgba(212,175,55,.12);}
+        .copy-pay-number.copied{border-color:rgba(59,183,80,.45);color:#3fb950;background:rgba(59,183,80,.12);}
         .history-empty{text-align:center;color:var(--muted);padding:22px 0;}
         .nav-back{margin-bottom:20px;}
         .nav-back a{color:var(--gold);font-size:.9rem;}
@@ -375,15 +379,24 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
             <div class="pay-methods">
                 <div class="pay-card">
                     <div class="m-name">bKash (বিকাশ)</div>
-                    <div class="m-number">Admin: <?= htmlspecialchars($adminPayNumber) ?></div>
+                    <div class="m-number">
+                        <span class="m-number-text">Admin: <?= htmlspecialchars($adminPayNumber) ?></span>
+                        <button type="button" class="copy-pay-number" data-copy-number="<?= htmlspecialchars($adminPayNumber, ENT_QUOTES, 'UTF-8') ?>" title="নাম্বার কপি করুন" aria-label="bKash নাম্বার কপি">📋</button>
+                    </div>
                 </div>
                 <div class="pay-card">
                     <div class="m-name">Rocket (রকেট)</div>
-                    <div class="m-number">Admin: <?= htmlspecialchars($adminPayNumber) ?></div>
+                    <div class="m-number">
+                        <span class="m-number-text">Admin: <?= htmlspecialchars($adminPayNumber) ?></span>
+                        <button type="button" class="copy-pay-number" data-copy-number="<?= htmlspecialchars($adminPayNumber, ENT_QUOTES, 'UTF-8') ?>" title="নাম্বার কপি করুন" aria-label="Rocket নাম্বার কপি">📋</button>
+                    </div>
                 </div>
                 <div class="pay-card">
                     <div class="m-name">Nagad (নগদ)</div>
-                    <div class="m-number">Admin: <?= htmlspecialchars($adminPayNumber) ?></div>
+                    <div class="m-number">
+                        <span class="m-number-text">Admin: <?= htmlspecialchars($adminPayNumber) ?></span>
+                        <button type="button" class="copy-pay-number" data-copy-number="<?= htmlspecialchars($adminPayNumber, ENT_QUOTES, 'UTF-8') ?>" title="নাম্বার কপি করুন" aria-label="Nagad নাম্বার কপি">📋</button>
+                    </div>
                 </div>
             </div>
             <form method="post">
@@ -526,6 +539,50 @@ $statusColor = ['pending'=>'#d4af37','confirmed'=>'#22c55e','completed'=>'#3b82f
             if (uploadForm) uploadForm.submit();
         });
     }
+
+    function copyTextToClipboard(text) {
+        if (!text) return Promise.reject(new Error('empty'));
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            return navigator.clipboard.writeText(text);
+        }
+
+        return new Promise(function(resolve, reject){
+            var helper = document.createElement('textarea');
+            helper.value = text;
+            helper.setAttribute('readonly', 'readonly');
+            helper.style.position = 'fixed';
+            helper.style.opacity = '0';
+            document.body.appendChild(helper);
+            helper.select();
+            helper.setSelectionRange(0, helper.value.length);
+            try {
+                var ok = document.execCommand('copy');
+                document.body.removeChild(helper);
+                if (ok) resolve();
+                else reject(new Error('copy-failed'));
+            } catch (err) {
+                document.body.removeChild(helper);
+                reject(err);
+            }
+        });
+    }
+
+    document.querySelectorAll('.copy-pay-number').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            var num = btn.getAttribute('data-copy-number') || '';
+            copyTextToClipboard(num).then(function(){
+                btn.classList.add('copied');
+                btn.textContent = '✓';
+                setTimeout(function(){
+                    btn.classList.remove('copied');
+                    btn.textContent = '📋';
+                }, 1200);
+            }).catch(function(){
+                btn.textContent = '!';
+                setTimeout(function(){ btn.textContent = '📋'; }, 1200);
+            });
+        });
+    });
 
     [modal, historyModal].forEach(function(m){
         if (!m) return;
