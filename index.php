@@ -6,24 +6,19 @@ require_once __DIR__ . '/includes/config.php';
 <!-- ===== ABOUT ===== -->
 <section id="about">
     <div class="container">
+        <div class="about-photo-home" style="text-align:center; margin-bottom: 24px;">
+            <img src="https://scontent.fdac177-2.fna.fbcdn.net/v/t39.30808-6/597425241_1504348431397430_5748346082661165302_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=k92RtCvGRxIQ7kNvwFh05gz&_nc_oc=AdoXodMKYji_IxWy4yjGzIHZNa5uleN6Sk91aUm-NZ5QkuAXqsrxsBLRf5iRExoJFds&_nc_zt=23&_nc_ht=scontent.fdac177-2.fna&_nc_gid=CVeG6fwgRO5TWX511FCjPQ&_nc_ss=7b289&oh=00_Af6CddAhe59L6HLHZpF03zhdQAzwepnBmcd0_o3JNdg2oA&oe=6A099309" alt="Photographer Sagor" style="max-width: 320px; width: 100%; border-radius: 12px; box-shadow: 0 4px 24px #0002;" loading="lazy">
+        </div>
         <div class="section-title">
             <span class="label">About Me</span>
             <h2>আমার সম্পর্কে জানুন</h2>
             <p>আমি একজন প্রফেশনাল ফটোগ্রাফার যিনি বিয়ে, জন্মদিন, পারিবারিক অনুষ্ঠান ও আউটডোর শুটের জন্য কাস্টমাইজড সার্ভিস দিই।</p>
         </div>
-
         <div class="about-grid">
-            <div class="about-img">
-                <img src="https://www.facebook.com/photo.php?fbid=1504347851397488&set=pb.100054668613267.-2207520000&type=3"
-                     alt="Photographer at work" loading="lazy">
-                <div class="exp-badge">✦ Professional Photographer</div>
-            </div>
-
             <div class="about-content">
                 <h2>প্রতিটি মুহূর্ত যেন একটি শিল্প</h2>
                 <p>আমি আপনার বিশেষ মুহূর্তগুলোকে সুন্দর ও পেশাদারভাবে ক্যামেরাবন্দি করি। প্রতিটি ছবিতে আমি নিশ্চিত করি সেরা আলো, কম্পোজিশন এবং অনুভূতি।</p>
                 <p>সাশ্রয়ী মূল্যে সর্বোচ্চ মানের ফটোগ্রাফি সার্ভিস — যেখানে প্রতিটি ছবির মূল্য মাত্র <strong class="text-gold">৳<?= PRICE_PER_PHOTO ?></strong> টাকা।</p>
-
                 <div class="stats-row">
                     <div class="stat"><span class="num">৫০০+</span><span class="lbl">সন্তুষ্ট ক্লাইন্ট</span></div>
                     <div class="stat"><span class="num">১০০০+</span><span class="lbl">ইভেন্ট কভার</span></div>
