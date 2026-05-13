@@ -305,6 +305,18 @@ function upsert_setting(PDO $pdo, string $key, string $value): void {
     $stmt->execute([$key, $value]);
 }
 
+function seed_setting_default(PDO $pdo, string $key, string $value): void {
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    if ($driver === 'mysql') {
+        $stmt = $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `key`=`key`");
+        $stmt->execute([$key, $value]);
+        return;
+    }
+
+    $stmt = $pdo->prepare("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)");
+    $stmt->execute([$key, $value]);
+}
+
 function get_db(): PDO {
     static $pdo = null;
     if ($pdo !== null) return $pdo;
@@ -374,7 +386,7 @@ function get_db(): PDO {
         'email'             => 'booking@sagor.accountsbazar.com',
         'location'          => 'বাংলাদেশ',
     ];
-    foreach ($defaults as $k => $v) upsert_setting($pdo, $k, $v);
+    foreach ($defaults as $k => $v) seed_setting_default($pdo, $k, $v);
 
     // Seed admin with a random password on first run
     $hasAdmin = $pdo->query("SELECT id FROM users WHERE is_admin=1")->fetch();
