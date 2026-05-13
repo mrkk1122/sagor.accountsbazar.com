@@ -29,8 +29,10 @@ $bStmt = $db->prepare("SELECT * FROM bookings WHERE user_id=? ORDER BY created_a
 $bStmt->execute([$user['id']]);
 $bookings = $bStmt->fetchAll();
 
-// Photos (same ORDER BY as download.php so free-slot positions are consistent)
-$photos = $db->query("SELECT * FROM photos ORDER BY created_at ASC")->fetchAll();
+// Photos - show only photos uploaded for this user or their bookings
+$pStmt = $db->prepare("SELECT * FROM photos WHERE user_id=? OR booking_id IN (SELECT id FROM bookings WHERE user_id=?) ORDER BY created_at ASC");
+$pStmt->execute([$user['id'], $user['id']]);
+$photos = $pStmt->fetchAll();
 
 // Build free-slot IDs from DB order (mirrors download.php logic exactly)
 $freeCount   = (int)get_setting('free_photos_count', (string)FREE_PHOTOS_COUNT);
