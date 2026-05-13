@@ -30,7 +30,7 @@ function handle_booking(): array {
     }
 
     if (!preg_match('/^01[3-9]\d{8}$/', preg_replace('/\s+/', '', $phone))) {
-        return ['success' => false, 'message' => 'সঠিক বাংলাদেশি মোবাইল নাম্বার দিন (01XXXXXXXXX)।'];
+        return ['success' => false, 'message' => 'সঠিক বাংলাদেশি মোবাইল নাম্বার দিন (01790088564)।'];
     }
 
     $booking_date = DateTime::createFromFormat('Y-m-d', $date);

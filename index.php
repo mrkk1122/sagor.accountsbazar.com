@@ -14,7 +14,7 @@ require_once __DIR__ . '/includes/config.php';
 
         <div class="about-grid">
             <div class="about-img">
-                <img src="https://images.unsplash.com/photo-1452378174528-3090a4bba7b2?auto=format&fit=crop&w=800&q=80"
+                <img src="https://www.facebook.com/photo.php?fbid=1504347851397488&set=pb.100054668613267.-2207520000&type=3"
                      alt="Photographer at work" loading="lazy">
                 <div class="exp-badge">✦ Professional Photographer</div>
             </div>

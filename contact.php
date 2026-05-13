@@ -57,21 +57,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_help_request']))
         </div>
 
         <div class="contact-grid">
-            <div class="contact-card">
+            <a href="tel:<?= preg_replace('/[^0-9]/', '', PHONE) ?>" class="contact-card" style="text-decoration:none;cursor:pointer;">
                 <div class="c-icon">📞</div>
                 <h4>ফোন কল</h4>
                 <p><?= PHONE ?></p>
-            </div>
-            <div class="contact-card">
+                <p style="font-size:.8rem;color:var(--muted);margin-top:6px;font-weight:600;">সরাসরি কল করুন</p>
+            </a>
+            <?php 
+                $waNum = preg_replace('/[^0-9]/', '', WHATSAPP);
+                if ($waNum !== '' && strlen($waNum) > 0) {
+                    if ($waNum[0] === '0') $waNum = '88' . substr($waNum, 1);
+                    elseif (strpos($waNum, '88') !== 0) $waNum = '88' . $waNum;
+                }
+                $waUrl = ($waNum !== '') ? ('https://wa.me/' . $waNum) : '#';
+            ?>
+            <a href="<?= htmlspecialchars($waUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" class="contact-card" style="text-decoration:none;cursor:pointer;">
                 <div class="c-icon">💬</div>
                 <h4>WhatsApp</h4>
                 <p><?= WHATSAPP ?></p>
-            </div>
-            <div class="contact-card">
+                <p style="font-size:.8rem;color:var(--muted);margin-top:6px;font-weight:600;">সরাসরি চ্যাট করুন</p>
+            </a>
+            <a href="mailto:<?= htmlspecialchars(EMAIL, ENT_QUOTES, 'UTF-8') ?>" class="contact-card" style="text-decoration:none;cursor:pointer;">
                 <div class="c-icon">📧</div>
                 <h4>ইমেইল</h4>
                 <p><?= EMAIL ?></p>
-            </div>
+                <p style="font-size:.8rem;color:var(--muted);margin-top:6px;font-weight:600;">ইমেইল পাঠান</p>
+            </a>
             <div class="contact-card">
                 <div class="c-icon">📍</div>
                 <h4>লোকেশন</h4>
