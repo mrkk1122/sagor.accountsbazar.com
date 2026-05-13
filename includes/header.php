@@ -74,6 +74,8 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
 </header>
 <script>
 (function(){
+    var POPUP_DONE_KEY = 'welcome_install_popup_done';
+
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(function(){});
     }
@@ -82,32 +84,29 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
     var installBtn = document.getElementById('welcome-install-btn');
     var pwaBtn = document.getElementById('pwa-install-btn');
     var installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    var popupDone = localStorage.getItem(POPUP_DONE_KEY) === '1';
 
     function openHomeAfterInstall() {
-        if (window.location.pathname !== '/') {
-            window.location.href = '/';
-            return;
-        }
-        window.location.reload();
+        window.location.href = '/';
     }
 
     window.addEventListener('beforeinstallprompt', function(e) {
         e.preventDefault();
         _prompt = e;
         if (pwaBtn) pwaBtn.style.display = 'inline-flex';
-        if (!installed && installModal) installModal.style.display = 'flex';
+        if (!installed && !popupDone && installModal) installModal.style.display = 'flex';
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        if (!installed && installModal) installModal.style.display = 'flex';
+        if (!installed && !popupDone && installModal) installModal.style.display = 'flex';
         if (installBtn) installBtn.onclick = function() {
+            localStorage.setItem(POPUP_DONE_KEY, '1');
+            popupDone = true;
+            if (installModal) installModal.style.display = 'none';
             if (_prompt) {
                 _prompt.prompt();
-                _prompt.userChoice.then(function(r) {
-                    if (r.outcome === 'accepted') {
-                        if (installModal) installModal.style.display = 'none';
-                        openHomeAfterInstall();
-                    }
+                _prompt.userChoice.then(function() {
+                    openHomeAfterInstall();
                 });
             } else {
                 window.location.href = '/';
