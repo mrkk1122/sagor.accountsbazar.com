@@ -110,11 +110,14 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
                     }
                 });
             } else {
-                alert('আপনার ব্রাউজারে ইনস্টল অপশন আসেনি। Chrome/Edge ব্যবহার করুন।');
+                window.location.href = '/';
             }
         };
         if (pwaBtn) pwaBtn.addEventListener('click', function() {
-            if (!_prompt) return;
+            if (!_prompt) {
+                window.location.href = '/';
+                return;
+            }
             _prompt.prompt();
             _prompt.userChoice.then(function(r) {
                 if (r.outcome === 'accepted') pwaBtn.style.display = 'none';

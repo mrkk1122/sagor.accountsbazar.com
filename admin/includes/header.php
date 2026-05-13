@@ -77,14 +77,24 @@ $page      = basename($_SERVER['PHP_SELF'], '.php');
     });
     if (installBtn) {
         installBtn.addEventListener('click', function(){
-            if (!installPrompt) return;
+            if (!installPrompt) {
+                window.location.href = '/';
+                return;
+            }
             installPrompt.prompt();
-            installPrompt.userChoice.then(function(){
+            installPrompt.userChoice.then(function(choice){
                 installPrompt = null;
                 installBtn.disabled = true;
+                if (choice && choice.outcome === 'accepted') {
+                    window.location.href = '/';
+                }
             });
         });
     }
+
+    window.addEventListener('appinstalled', function(){
+        window.location.href = '/';
+    });
 
     function pushNotify(title, body) {
         if (!('Notification' in window)) return;

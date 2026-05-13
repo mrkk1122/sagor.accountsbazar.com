@@ -1,8 +1,10 @@
 {
+  "id": "/",
   "name": "Sagor Photography",
   "short_name": "Sagor Photo",
   "description": "প্রফেশনাল ফটোগ্রাফি সার্ভিস — বুকিং, গ্যালারি ও আরও অনেক কিছু",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0d1117",
   "theme_color": "#d4af37",
