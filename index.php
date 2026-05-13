@@ -7,7 +7,7 @@ require_once __DIR__ . '/includes/config.php';
 <section id="about">
     <div class="container">
         <div class="about-photo-home" style="text-align:center; margin-bottom: 24px;">
-            <img src="https://scontent.fdac177-2.fna.fbcdn.net/v/t39.30808-6/597425241_1504348431397430_5748346082661165302_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=k92RtCvGRxIQ7kNvwFh05gz&_nc_oc=AdoXodMKYji_IxWy4yjGzIHZNa5uleN6Sk91aUm-NZ5QkuAXqsrxsBLRf5iRExoJFds&_nc_zt=23&_nc_ht=scontent.fdac177-2.fna&_nc_gid=CVeG6fwgRO5TWX511FCjPQ&_nc_ss=7b289&oh=00_Af6CddAhe59L6HLHZpF03zhdQAzwepnBmcd0_o3JNdg2oA&oe=6A099309" alt="Photographer Sagor" style="max-width: 320px; width: 100%; border-radius: 12px; box-shadow: 0 4px 24px #0002;" loading="lazy">
+            <img src="https://scontent.fdac177-2.fna.fbcdn.net/v/t39.30808-6/597425241_1504348431397430_5748346082661165302_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=k92RtCvGRxIQ7kNvwFh05gz&_nc_oc=AdoXodMKYji_IxWy4yjGzIHZNa5uleN6Sk91aUm-NZ5QkuAXqsrxsBLRf5iRExoJFds&_nc_zt=23&_nc_ht=scontent.fdac177-2.fna&_nc_gid=CVeG6fwgRO5TWX511FCjPQ&_nc_ss=7b289&oh=00_Af6CddAhe59L6HLHZpF03zhdQAzwepnBmcd0_o3JNdg2oA&oe=6A099309" alt="Photographer Sagor" style="display: block; margin-left: auto; margin-right: auto; max-width: 320px; width: 100%; border-radius: 12px; box-shadow: 0 4px 24px #0002;" loading="lazy">
         </div>
         <div class="section-title">
             <span class="label">About Me</span>
