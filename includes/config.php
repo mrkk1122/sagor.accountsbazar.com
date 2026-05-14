@@ -30,9 +30,31 @@ define('MAIL_SECURITY', 'ssl'); // ssl for 465
 define('MAIL_FROM_EMAIL', 'sagor@accountsbazar.com');
 define('MAIL_FROM_NAME', SITE_NAME);
 
+if (!function_exists('resolve_openrouter_api_key')) {
+    function resolve_openrouter_api_key()
+    {
+        $candidate = '';
+
+        if (getenv('OPENROUTER_API_KEY') !== false) {
+            $candidate = (string)getenv('OPENROUTER_API_KEY');
+        } elseif (isset($_SERVER['OPENROUTER_API_KEY'])) {
+            $candidate = (string)$_SERVER['OPENROUTER_API_KEY'];
+        } elseif (isset($_ENV['OPENROUTER_API_KEY'])) {
+            $candidate = (string)$_ENV['OPENROUTER_API_KEY'];
+        }
+
+        $candidate = trim($candidate);
+        if ($candidate === '' || strtoupper($candidate) === 'YOUR_OPENROUTER_API_KEY') {
+            return '';
+        }
+
+        return $candidate;
+    }
+}
+
 // AI (OpenRouter)
 define('OPENROUTER_API_URL', 'https://openrouter.ai/api/v1/chat/completions');
-define('OPENROUTER_API_KEY', (string)getenv('OPENROUTER_API_KEY'));
+define('OPENROUTER_API_KEY', resolve_openrouter_api_key());
 
 // Weekly schedule: day => [ open, close ] or false if closed
 $SCHEDULE = [

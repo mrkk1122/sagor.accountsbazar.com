@@ -39,9 +39,10 @@ if ($prompt === '') {
     exit;
 }
 
-if (OPENROUTER_API_KEY === '') {
+$apiKey = trim((string)OPENROUTER_API_KEY);
+if ($apiKey === '' || strpos($apiKey, 'sk-or-v1-') !== 0) {
     http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => 'OpenRouter API key is missing']);
+    echo json_encode(['ok' => false, 'error' => 'OpenRouter API key missing বা invalid। health-check.php দেখে key set করুন।']);
     exit;
 }
 
@@ -68,7 +69,7 @@ curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_HTTPHEADER => [
-        'Authorization: Bearer ' . OPENROUTER_API_KEY,
+        'Authorization: Bearer ' . $apiKey,
         'Content-Type: application/json',
         'HTTP-Referer: https://sagor.accountsbazar.com',
         'X-Title: Sagor AI Generator',
