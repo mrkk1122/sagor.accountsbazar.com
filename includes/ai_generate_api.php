@@ -98,10 +98,28 @@ $extMap = [
     'image/webp' => 'webp',
 ];
 
+$allowedExtensions = [
+    'jpg' => 'image/jpeg',
+    'jpeg' => 'image/jpeg',
+    'png' => 'image/png',
+    'webp' => 'image/webp',
+];
+
 if (!isset($extMap[$mime])) {
-    http_response_code(422);
-    echo json_encode(['ok' => false, 'error' => 'Only JPG, PNG, WEBP allowed']);
-    exit;
+    // Some shared host environments return empty or generic MIME types.
+    // In that case, use file extension fallback for common image formats.
+    $originalName = strtolower((string)($src['name'] ?? ''));
+    $fileExt = pathinfo($originalName, PATHINFO_EXTENSION);
+    if ($fileExt !== '' && isset($allowedExtensions[$fileExt])) {
+        $mime = $allowedExtensions[$fileExt];
+    } else {
+        http_response_code(422);
+        echo json_encode([
+            'ok' => false,
+            'error' => 'Only JPG, PNG, WEBP allowed',
+        ]);
+        exit;
+    }
 }
 
 $uploadDir = dirname(__DIR__) . '/uploads/ai-edits';
