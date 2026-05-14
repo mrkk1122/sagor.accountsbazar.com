@@ -8,12 +8,20 @@ $keyLoaded = $key !== '';
 $keyFormatValid = $keyLoaded && strpos($key, 'sk-or-v1-') === 0;
 
 $keySource = 'none';
-if (getenv('OPENROUTER_API_KEY') !== false && trim((string)getenv('OPENROUTER_API_KEY')) !== '') {
-    $keySource = 'getenv';
+$rawEnv = getenv('OPENROUTER_API_KEY');
+$rawServer = isset($_SERVER['OPENROUTER_API_KEY']) ? (string)$_SERVER['OPENROUTER_API_KEY'] : '';
+$rawDotEnv = isset($_ENV['OPENROUTER_API_KEY']) ? (string)$_ENV['OPENROUTER_API_KEY'] : '';
+
+if ($rawEnv !== false && trim((string)$rawEnv) !== '') {
+    $keySource = stripos((string)$rawEnv, 'your_openrouter_api_key') !== false ? 'getenv-placeholder' : 'getenv';
 } elseif (isset($_SERVER['OPENROUTER_API_KEY']) && trim((string)$_SERVER['OPENROUTER_API_KEY']) !== '') {
-    $keySource = '$_SERVER';
+    $keySource = stripos((string)$_SERVER['OPENROUTER_API_KEY'], 'your_openrouter_api_key') !== false ? '$_SERVER-placeholder' : '$_SERVER';
 } elseif (isset($_ENV['OPENROUTER_API_KEY']) && trim((string)$_ENV['OPENROUTER_API_KEY']) !== '') {
-    $keySource = '$_ENV';
+    $keySource = stripos((string)$_ENV['OPENROUTER_API_KEY'], 'your_openrouter_api_key') !== false ? '$_ENV-placeholder' : '$_ENV';
+} elseif (is_file(__DIR__ . '/includes/.openrouter.key')) {
+    $keySource = 'includes/.openrouter.key';
+} elseif (is_file(__DIR__ . '/.openrouter.key')) {
+    $keySource = '.openrouter.key';
 }
 
 $maskedKey = '';
@@ -33,6 +41,9 @@ $response = [
         'openrouter_key_format_valid' => $keyFormatValid,
         'openrouter_key_masked' => $maskedKey,
         'openrouter_key_source' => $keySource,
+        'raw_env_has_value' => ($rawEnv !== false && trim((string)$rawEnv) !== ''),
+        'raw_server_has_value' => trim($rawServer) !== '',
+        'raw_dotenv_has_value' => trim($rawDotEnv) !== '',
         'curl_extension_loaded' => function_exists('curl_init'),
         'php_version' => PHP_VERSION,
     ],

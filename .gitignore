@@ -4,3 +4,5 @@ db/admin_credentials.txt
 bookings/*.log
 uploads/photos/*
 !uploads/photos/.gitkeep
+includes/.openrouter.key
+.openrouter.key

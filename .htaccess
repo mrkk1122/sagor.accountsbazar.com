@@ -25,10 +25,8 @@ Options -Indexes
     RewriteRule ^db/.*$ - [F,L]
 </IfModule>
 
-# AI key via Apache env (replace with your real key on server)
-<IfModule mod_env.c>
-    SetEnv OPENROUTER_API_KEY "YOUR_OPENROUTER_API_KEY"
-</IfModule>
+# AI key via Apache env (set on server; do not commit real key)
+# Example (server only): SetEnv OPENROUTER_API_KEY "sk-or-v1-..."
 
 # Charset
 AddDefaultCharset UTF-8

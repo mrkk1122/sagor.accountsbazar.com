@@ -41,10 +41,33 @@ if (!function_exists('resolve_openrouter_api_key')) {
             $candidate = (string)$_SERVER['OPENROUTER_API_KEY'];
         } elseif (isset($_ENV['OPENROUTER_API_KEY'])) {
             $candidate = (string)$_ENV['OPENROUTER_API_KEY'];
+        } else {
+            $fileCandidates = [
+                __DIR__ . '/.openrouter.key',
+                dirname(__DIR__) . '/.openrouter.key',
+            ];
+
+            foreach ($fileCandidates as $keyFile) {
+                if (!is_file($keyFile)) {
+                    continue;
+                }
+
+                $content = @file_get_contents($keyFile);
+                if ($content === false) {
+                    continue;
+                }
+
+                $candidate = (string)$content;
+                break;
+            }
         }
 
         $candidate = trim($candidate);
-        if ($candidate === '' || strtoupper($candidate) === 'YOUR_OPENROUTER_API_KEY') {
+        if (
+            $candidate === '' ||
+            strtoupper($candidate) === 'YOUR_OPENROUTER_API_KEY' ||
+            stripos($candidate, 'your_openrouter_api_key') !== false
+        ) {
             return '';
         }
 
