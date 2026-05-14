@@ -56,6 +56,10 @@ if (!function_exists('resolve_openrouter_api_key')) {
                 dirname(__DIR__) . '/.openrouter.key',
                 __DIR__ . '/.openrouter.key.txt',
                 dirname(__DIR__) . '/.openrouter.key.txt',
+                __DIR__ . '/openrouter.key',
+                dirname(__DIR__) . '/openrouter.key',
+                __DIR__ . '/openrouter.key.txt',
+                dirname(__DIR__) . '/openrouter.key.txt',
             ];
 
             foreach ($fileCandidates as $keyFile) {

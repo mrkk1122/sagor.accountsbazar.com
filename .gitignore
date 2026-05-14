@@ -8,4 +8,8 @@ includes/.openrouter.key
 .openrouter.key
 includes/.openrouter.key.txt
 .openrouter.key.txt
+includes/openrouter.key
+openrouter.key
+includes/openrouter.key.txt
+openrouter.key.txt
 includes/secret.local.php
