@@ -138,8 +138,23 @@
 			body: formData
 		})
 		.then(function (res) {
-			return res.json().catch(function () {
-				return { ok: false, error: 'Server response parse failed' };
+			return res.text().then(function (txt) {
+				try {
+					var json = JSON.parse(txt);
+					if (!res.ok && (!json || !json.error)) {
+						return { ok: false, error: 'HTTP ' + res.status + ' error' };
+					}
+					return json;
+				} catch (e) {
+					var plain = (txt || '').trim();
+					if (plain.length > 180) {
+						plain = plain.slice(0, 180) + '...';
+					}
+					return {
+						ok: false,
+						error: 'Server JSON না দিয়ে অন্য response দিয়েছে (HTTP ' + res.status + '). ' + (plain || 'Empty response')
+					};
+				}
 			});
 		})
 		.then(function (data) {

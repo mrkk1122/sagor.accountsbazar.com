@@ -71,10 +71,25 @@ if ((int)($src['size'] ?? 0) <= 0 || (int)$src['size'] > $maxBytes) {
     exit;
 }
 
-$finfo = finfo_open(FILEINFO_MIME_TYPE);
-$mime = $finfo ? (string)finfo_file($finfo, $tmpPath) : '';
-if ($finfo) {
-    finfo_close($finfo);
+$mime = '';
+if (function_exists('finfo_open') && function_exists('finfo_file') && function_exists('finfo_close')) {
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = $finfo ? (string)finfo_file($finfo, $tmpPath) : '';
+    if ($finfo) {
+        finfo_close($finfo);
+    }
+}
+
+if ($mime === '' && function_exists('exif_imagetype')) {
+    $imgType = @exif_imagetype($tmpPath);
+    $typeMap = [
+        IMAGETYPE_JPEG => 'image/jpeg',
+        IMAGETYPE_PNG => 'image/png',
+        IMAGETYPE_WEBP => 'image/webp',
+    ];
+    if ($imgType && isset($typeMap[$imgType])) {
+        $mime = $typeMap[$imgType];
+    }
 }
 
 $extMap = [
