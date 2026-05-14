@@ -22,6 +22,10 @@ if ($rawEnv !== false && trim((string)$rawEnv) !== '') {
     $keySource = 'includes/.openrouter.key';
 } elseif (is_file(__DIR__ . '/.openrouter.key')) {
     $keySource = '.openrouter.key';
+} elseif (is_file(__DIR__ . '/includes/.openrouter.key.txt')) {
+    $keySource = 'includes/.openrouter.key.txt';
+} elseif (is_file(__DIR__ . '/.openrouter.key.txt')) {
+    $keySource = '.openrouter.key.txt';
 }
 
 $maskedKey = '';
@@ -49,7 +53,7 @@ $response = [
     ],
     'next' => ($keyLoaded && $keyFormatValid)
         ? 'API key loaded. You can now test AI generation from /ai_photo_genaretor.php'
-        : 'API key missing/invalid. Set OPENROUTER_API_KEY in Apache env, restart Apache, then recheck health-check.php',
+        : 'API key missing/invalid. Set OPENROUTER_API_KEY in env or create includes/.openrouter.key(.txt), then recheck health-check.php',
 ];
 
 echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

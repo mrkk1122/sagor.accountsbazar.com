@@ -6,4 +6,6 @@ uploads/photos/*
 !uploads/photos/.gitkeep
 includes/.openrouter.key
 .openrouter.key
+includes/.openrouter.key.txt
+.openrouter.key.txt
 includes/secret.local.php
