@@ -89,6 +89,24 @@
 		messagesEl.scrollTop = messagesEl.scrollHeight;
 	}
 
+	function addImageMessage(url, caption) {
+		var wrapper = document.createElement('div');
+		wrapper.className = 'msg msg-ai msg-media';
+
+		var img = document.createElement('img');
+		img.src = url;
+		img.alt = caption || 'Generated photo';
+		img.loading = 'lazy';
+
+		var p = document.createElement('p');
+		p.textContent = caption || 'Generated photo';
+
+		wrapper.appendChild(img);
+		wrapper.appendChild(p);
+		messagesEl.appendChild(wrapper);
+		messagesEl.scrollTop = messagesEl.scrollHeight;
+	}
+
 	function setMode(mode) {
 		currentMode = mode;
 		var isPhoto = mode === 'photo';
@@ -154,7 +172,14 @@
 				return;
 			}
 
-			addMessage(data.message || 'Done', 'ai');
+			if (data.image_url) {
+				addImageMessage(data.image_url, 'Generated Image (Seed: ' + (data.seed || '-') + ')');
+			}
+
+			if (data.message) {
+				addMessage(data.message, 'ai');
+			}
+
 			promptEl.value = '';
 			promptEl.focus();
 		})

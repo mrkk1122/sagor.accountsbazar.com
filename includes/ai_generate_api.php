@@ -39,6 +39,23 @@ if ($prompt === '') {
     exit;
 }
 
+if ($mode === 'photo') {
+    $seed = random_int(100000, 999999);
+    $finalPrompt = trim($prompt . ', ' . $style . ' style, high quality, ultra detailed, cinematic lighting');
+    $imageUrl = 'https://image.pollinations.ai/prompt/' . rawurlencode($finalPrompt)
+        . '?width=1024&height=1024&seed=' . $seed . '&nologo=true';
+
+    echo json_encode([
+        'ok' => true,
+        'mode' => 'photo',
+        'provider' => 'pollinations',
+        'message' => 'Photo generated. নিচে preview দেখুন।',
+        'image_url' => $imageUrl,
+        'seed' => $seed,
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 $apiKey = trim((string)OPENROUTER_API_KEY);
 if ($apiKey === '' || strpos($apiKey, 'sk-or-v1-') !== 0) {
     http_response_code(500);
