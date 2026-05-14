@@ -12,6 +12,9 @@ Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Allow only the AI API endpoint from includes/
+    RewriteRule ^includes/ai_generate_api\.php$ - [L]
+
     # Block direct access to includes/
     RewriteRule ^includes/.*$ - [F,L]
 
@@ -20,6 +23,11 @@ Options -Indexes
 
     # Block direct access to db/
     RewriteRule ^db/.*$ - [F,L]
+</IfModule>
+
+# AI key via Apache env (replace with your real key on server)
+<IfModule mod_env.c>
+    SetEnv OPENROUTER_API_KEY "YOUR_OPENROUTER_API_KEY"
 </IfModule>
 
 # Charset
