@@ -18,24 +18,25 @@ if (!$user) {
     exit;
 }
 
-$raw = file_get_contents('php://input');
-$payload = json_decode($raw ?: '{}', true);
-if (!is_array($payload)) {
-    $payload = [];
+$isMultipart = isset($_SERVER['CONTENT_TYPE']) && stripos((string)$_SERVER['CONTENT_TYPE'], 'multipart/form-data') !== false;
+
+$payload = [];
+if ($isMultipart) {
+    $payload = $_POST;
+} else {
+    $raw = file_get_contents('php://input');
+    $payload = json_decode($raw ?: '{}', true);
+    if (!is_array($payload)) {
+        $payload = [];
+    }
 }
 
-$mode = strtolower(trim((string)($payload['mode'] ?? 'photo')));
-if ($mode !== 'photo' && $mode !== 'video') {
-    $mode = 'photo';
+$mode = strtolower(trim((string)($payload['mode'] ?? 'photo_edit')));
+if ($mode !== 'photo_edit') {
+    $mode = 'photo_edit';
 }
 
 $prompt = trim((string)($payload['prompt'] ?? ''));
-$style = trim((string)($payload['style'] ?? 'Realistic'));
-$length = trim((string)($payload['length'] ?? '5s'));
-$negativePrompt = trim((string)($payload['negative_prompt'] ?? ''));
-$strictMode = !empty($payload['strict_mode']);
-$seedLock = !empty($payload['seed_lock']);
-$seedInput = trim((string)($payload['seed'] ?? ''));
 
 if ($prompt === '') {
     http_response_code(422);
@@ -43,120 +44,86 @@ if ($prompt === '') {
     exit;
 }
 
-if ($mode === 'photo') {
-    $seed = random_int(100000, 999999);
-    if ($seedLock && ctype_digit($seedInput)) {
-        $seedCandidate = (int)$seedInput;
-        if ($seedCandidate > 0 && $seedCandidate <= 2147483647) {
-            $seed = $seedCandidate;
-        }
-    }
-
-    $promptParts = [];
-    $promptParts[] = $prompt;
-    $promptParts[] = $style . ' style';
-    if ($strictMode) {
-        $promptParts[] = 'strict prompt adherence';
-        $promptParts[] = 'preserve exact subject and composition';
-        $promptParts[] = 'do not add unrelated objects';
-    }
-    if ($negativePrompt !== '') {
-        $promptParts[] = 'avoid: ' . $negativePrompt;
-    }
-    $promptParts[] = 'high quality';
-    $promptParts[] = 'ultra detailed';
-    $promptParts[] = 'cinematic lighting';
-
-    $finalPrompt = implode(', ', $promptParts);
-    $imageUrl = 'https://image.pollinations.ai/prompt/' . rawurlencode($finalPrompt)
-        . '?width=1024&height=1024&seed=' . $seed . '&nologo=true';
-
-    echo json_encode([
-        'ok' => true,
-        'mode' => 'photo',
-        'provider' => 'pollinations',
-        'message' => 'Photo generated. নিচে preview দেখুন।',
-        'image_url' => $imageUrl,
-        'seed' => $seed,
-        'strict_mode' => $strictMode,
-        'final_prompt' => $finalPrompt,
-    ], JSON_UNESCAPED_UNICODE);
+if (!isset($_FILES['source_image']) || !is_array($_FILES['source_image'])) {
+    http_response_code(422);
+    echo json_encode(['ok' => false, 'error' => 'Source image upload করা আবশ্যক']);
     exit;
 }
 
-$apiKey = trim((string)OPENROUTER_API_KEY);
-if ($apiKey === '' || strpos($apiKey, 'sk-or-v1-') !== 0) {
-    http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => 'OpenRouter API key missing বা invalid। health-check.php দেখে key set করুন।']);
+$src = $_FILES['source_image'];
+if ((int)($src['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+    http_response_code(422);
+    echo json_encode(['ok' => false, 'error' => 'Image upload failed']);
     exit;
 }
 
-$systemMsg = $mode === 'photo'
-    ? 'You are an expert image prompt assistant. Return concise, useful generation guidance in Bangla.'
-    : 'You are an expert short-video prompt assistant. Return concise, useful generation guidance in Bangla.';
+$tmpPath = (string)($src['tmp_name'] ?? '');
+if ($tmpPath === '' || !is_uploaded_file($tmpPath)) {
+    http_response_code(422);
+    echo json_encode(['ok' => false, 'error' => 'Invalid uploaded file']);
+    exit;
+}
 
-$userMsg = $mode === 'photo'
-    ? "Prompt: {$prompt}\nStyle: {$style}\nGive: 1) refined prompt 2) short tips."
-    : "Prompt: {$prompt}\nLength: {$length}\nGive: 1) refined video prompt 2) short shot plan in Bangla.";
+$maxBytes = 8 * 1024 * 1024;
+if ((int)($src['size'] ?? 0) <= 0 || (int)$src['size'] > $maxBytes) {
+    http_response_code(422);
+    echo json_encode(['ok' => false, 'error' => 'Image size সর্বোচ্চ 8MB হতে হবে']);
+    exit;
+}
 
-$request = [
-    'model' => 'openai/gpt-4o-mini',
-    'messages' => [
-        ['role' => 'system', 'content' => $systemMsg],
-        ['role' => 'user', 'content' => $userMsg],
-    ],
-    'temperature' => 0.7,
-    'max_tokens' => 280,
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+$mime = $finfo ? (string)finfo_file($finfo, $tmpPath) : '';
+if ($finfo) {
+    finfo_close($finfo);
+}
+
+$extMap = [
+    'image/jpeg' => 'jpg',
+    'image/png' => 'png',
+    'image/webp' => 'webp',
 ];
 
-$ch = curl_init(OPENROUTER_API_URL);
-curl_setopt_array($ch, [
-    CURLOPT_POST => true,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_HTTPHEADER => [
-        'Authorization: Bearer ' . $apiKey,
-        'Content-Type: application/json',
-        'HTTP-Referer: https://sagor.accountsbazar.com',
-        'X-Title: Sagor AI Generator',
-    ],
-    CURLOPT_POSTFIELDS => json_encode($request, JSON_UNESCAPED_UNICODE),
-    CURLOPT_TIMEOUT => 30,
-]);
-
-$response = curl_exec($ch);
-$curlErr = curl_error($ch);
-$status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-curl_close($ch);
-
-if ($response === false || $curlErr !== '') {
-    http_response_code(502);
-    echo json_encode(['ok' => false, 'error' => 'API connection failed: ' . $curlErr]);
+if (!isset($extMap[$mime])) {
+    http_response_code(422);
+    echo json_encode(['ok' => false, 'error' => 'Only JPG, PNG, WEBP allowed']);
     exit;
 }
 
-$data = json_decode($response, true);
-if (!is_array($data)) {
-    http_response_code(502);
-    echo json_encode(['ok' => false, 'error' => 'Invalid API response']);
+$uploadDir = dirname(__DIR__) . '/uploads/ai-edits';
+if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+    http_response_code(500);
+    echo json_encode(['ok' => false, 'error' => 'Upload directory তৈরি করা যায়নি']);
     exit;
 }
 
-if ($status >= 400) {
-    $apiErr = (string)($data['error']['message'] ?? ('API failed with status ' . $status));
-    http_response_code(502);
-    echo json_encode(['ok' => false, 'error' => $apiErr]);
+$filename = 'src_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $extMap[$mime];
+$targetPath = $uploadDir . '/' . $filename;
+if (!move_uploaded_file($tmpPath, $targetPath)) {
+    http_response_code(500);
+    echo json_encode(['ok' => false, 'error' => 'Uploaded file save করা যায়নি']);
     exit;
 }
 
-$text = trim((string)($data['choices'][0]['message']['content'] ?? ''));
-if ($text === '') {
-    $text = $mode === 'photo'
-        ? 'Photo prompt তৈরি হয়েছে, আবার চেষ্টা করুন।'
-        : 'Video prompt তৈরি হয়েছে, আবার চেষ্টা করুন।';
-}
+$seed = random_int(100000, 999999);
+$finalPrompt = trim($prompt . ', preserve same person identity, preserve face structure, realistic edit, high quality, do not change subject');
+
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = (string)($_SERVER['HTTP_HOST'] ?? 'localhost');
+$sourceUrl = $scheme . '://' . $host . '/uploads/ai-edits/' . rawurlencode($filename);
+
+$imageUrl = 'https://image.pollinations.ai/prompt/' . rawurlencode($finalPrompt)
+    . '?width=1024&height=1024&seed=' . $seed
+    . '&image=' . rawurlencode($sourceUrl)
+    . '&nologo=true';
 
 echo json_encode([
     'ok' => true,
-    'mode' => $mode,
-    'message' => $text,
+    'mode' => 'photo_edit',
+    'provider' => 'pollinations',
+    'message' => 'Photo edit complete. নিচে result দেখুন।',
+    'source_image_url' => $sourceUrl,
+    'image_url' => $imageUrl,
+    'seed' => $seed,
+    'final_prompt' => $finalPrompt,
 ], JSON_UNESCAPED_UNICODE);
+exit;
