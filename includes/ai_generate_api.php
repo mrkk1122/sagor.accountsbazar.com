@@ -32,6 +32,10 @@ if ($mode !== 'photo' && $mode !== 'video') {
 $prompt = trim((string)($payload['prompt'] ?? ''));
 $style = trim((string)($payload['style'] ?? 'Realistic'));
 $length = trim((string)($payload['length'] ?? '5s'));
+$negativePrompt = trim((string)($payload['negative_prompt'] ?? ''));
+$strictMode = !empty($payload['strict_mode']);
+$seedLock = !empty($payload['seed_lock']);
+$seedInput = trim((string)($payload['seed'] ?? ''));
 
 if ($prompt === '') {
     http_response_code(422);
@@ -41,7 +45,29 @@ if ($prompt === '') {
 
 if ($mode === 'photo') {
     $seed = random_int(100000, 999999);
-    $finalPrompt = trim($prompt . ', ' . $style . ' style, high quality, ultra detailed, cinematic lighting');
+    if ($seedLock && ctype_digit($seedInput)) {
+        $seedCandidate = (int)$seedInput;
+        if ($seedCandidate > 0 && $seedCandidate <= 2147483647) {
+            $seed = $seedCandidate;
+        }
+    }
+
+    $promptParts = [];
+    $promptParts[] = $prompt;
+    $promptParts[] = $style . ' style';
+    if ($strictMode) {
+        $promptParts[] = 'strict prompt adherence';
+        $promptParts[] = 'preserve exact subject and composition';
+        $promptParts[] = 'do not add unrelated objects';
+    }
+    if ($negativePrompt !== '') {
+        $promptParts[] = 'avoid: ' . $negativePrompt;
+    }
+    $promptParts[] = 'high quality';
+    $promptParts[] = 'ultra detailed';
+    $promptParts[] = 'cinematic lighting';
+
+    $finalPrompt = implode(', ', $promptParts);
     $imageUrl = 'https://image.pollinations.ai/prompt/' . rawurlencode($finalPrompt)
         . '?width=1024&height=1024&seed=' . $seed . '&nologo=true';
 
@@ -52,6 +78,8 @@ if ($mode === 'photo') {
         'message' => 'Photo generated. নিচে preview দেখুন।',
         'image_url' => $imageUrl,
         'seed' => $seed,
+        'strict_mode' => $strictMode,
+        'final_prompt' => $finalPrompt,
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }

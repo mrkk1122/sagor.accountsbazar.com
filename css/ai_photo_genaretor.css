@@ -226,7 +226,8 @@
 }
 
 .ai-compose textarea,
-.ai-compose select {
+.ai-compose select,
+.ai-compose input {
 	width: 100%;
 	border-radius: 10px;
 	border: 1px solid rgba(255, 255, 255, 0.16);
@@ -238,7 +239,8 @@
 }
 
 .ai-compose textarea:focus,
-.ai-compose select:focus {
+.ai-compose select:focus,
+.ai-compose input:focus {
 	border-color: rgba(212, 175, 55, 0.7);
 	box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
 }
@@ -256,6 +258,32 @@
 	font-size: 0.78rem;
 	font-weight: 700;
 	letter-spacing: 0.2px;
+}
+
+.option-check {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 8px;
+	font-size: 0.8rem;
+	color: var(--light);
+	font-weight: 500;
+}
+
+.option-check input {
+	width: 14px;
+	height: 14px;
+	margin: 0;
+	padding: 0;
+	accent-color: #10b981;
+}
+
+.option-check-main {
+	margin-top: 26px;
+	padding: 10px 12px;
+	border: 1px solid rgba(16, 185, 129, 0.4);
+	border-radius: 10px;
+	background: rgba(16, 185, 129, 0.12);
 }
 
 .ai-send-btn {

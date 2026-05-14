@@ -50,6 +50,24 @@
 								<option value="Fantasy">Fantasy</option>
 							</select>
 						</div>
+						<div class="field-wrap" id="photo-negative-wrap">
+							<label for="photo-negative">Negative Prompt (কি চাই না)</label>
+							<textarea id="photo-negative" rows="2" placeholder="no text, no watermark, no extra people"></textarea>
+						</div>
+						<div class="field-wrap" id="photo-seed-wrap">
+							<label for="photo-seed">Seed (repeatable output)</label>
+							<input id="photo-seed" type="number" min="1" max="2147483647" placeholder="Optional e.g. 12345">
+							<label class="option-check">
+								<input id="photo-seed-lock" type="checkbox">
+								<span>Lock seed</span>
+							</label>
+						</div>
+						<div class="field-wrap" id="photo-strict-wrap">
+							<label class="option-check option-check-main">
+								<input id="photo-strict" type="checkbox" checked>
+								<span>Strict Prompt Mode</span>
+							</label>
+						</div>
 						<div class="field-wrap" id="video-options" hidden>
 							<label for="video-length">Video Length</label>
 							<select id="video-length">
@@ -81,7 +99,14 @@
 	var messagesEl = document.getElementById('ai-messages');
 	var form = document.getElementById('ai-generate-form');
 	var photoOptions = document.getElementById('photo-options');
+	var photoNegativeWrap = document.getElementById('photo-negative-wrap');
+	var photoSeedWrap = document.getElementById('photo-seed-wrap');
+	var photoStrictWrap = document.getElementById('photo-strict-wrap');
 	var videoOptions = document.getElementById('video-options');
+	var photoNegative = document.getElementById('photo-negative');
+	var photoSeed = document.getElementById('photo-seed');
+	var photoSeedLock = document.getElementById('photo-seed-lock');
+	var photoStrict = document.getElementById('photo-strict');
 	var quickItems = document.querySelectorAll('.quick-item');
 
 	if (!form || !messagesEl || !submitBtn) {
@@ -143,6 +168,9 @@
 		});
 
 		photoOptions.hidden = !isPhoto;
+		photoNegativeWrap.hidden = !isPhoto;
+		photoSeedWrap.hidden = !isPhoto;
+		photoStrictWrap.hidden = !isPhoto;
 		videoOptions.hidden = isPhoto;
 		submitBtn.textContent = isPhoto ? 'Generate Photo' : 'Generate Video';
 		currentModeBadge.textContent = isPhoto ? 'Photo Mode Active' : 'Video Mode Active';
@@ -180,7 +208,7 @@
 
 		var isPhoto = currentMode === 'photo';
 		var meta = isPhoto
-			? ('Style: ' + (document.getElementById('photo-style').value || 'Realistic'))
+			? ('Style: ' + (document.getElementById('photo-style').value || 'Realistic') + ', Strict: ' + (photoStrict && photoStrict.checked ? 'On' : 'Off'))
 			: ('Length: ' + (document.getElementById('video-length').value || '5s'));
 
 		addMessage((isPhoto ? 'Photo' : 'Video') + ' request: ' + prompt + ' (' + meta + ')', 'user');
@@ -198,7 +226,11 @@
 				mode: currentMode,
 				prompt: prompt,
 				style: document.getElementById('photo-style').value || 'Realistic',
-				length: document.getElementById('video-length').value || '5s'
+				length: document.getElementById('video-length').value || '5s',
+				negative_prompt: photoNegative ? (photoNegative.value || '').trim() : '',
+				strict_mode: !!(photoStrict && photoStrict.checked),
+				seed_lock: !!(photoSeedLock && photoSeedLock.checked),
+				seed: photoSeed ? (photoSeed.value || '') : ''
 			})
 		})
 		.then(function (res) {
@@ -219,6 +251,10 @@
 
 			if (data.message) {
 				addMessage(data.message, 'ai');
+			}
+
+			if (data.final_prompt) {
+				addMessage('Used prompt: ' + data.final_prompt, 'ai');
 			}
 
 			promptEl.value = '';
