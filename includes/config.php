@@ -30,18 +30,27 @@ define('MAIL_SECURITY', 'ssl'); // ssl for 465
 define('MAIL_FROM_EMAIL', 'sagor@accountsbazar.com');
 define('MAIL_FROM_NAME', SITE_NAME);
 
+$secretLocalConfig = __DIR__ . '/secret.local.php';
+if (is_file($secretLocalConfig)) {
+    require_once $secretLocalConfig;
+}
+
 if (!function_exists('resolve_openrouter_api_key')) {
     function resolve_openrouter_api_key()
     {
         $candidate = '';
 
-        if (getenv('OPENROUTER_API_KEY') !== false) {
+        if (defined('OPENROUTER_API_KEY_OVERRIDE')) {
+            $candidate = (string)OPENROUTER_API_KEY_OVERRIDE;
+        }
+
+        if ($candidate === '' && getenv('OPENROUTER_API_KEY') !== false) {
             $candidate = (string)getenv('OPENROUTER_API_KEY');
-        } elseif (isset($_SERVER['OPENROUTER_API_KEY'])) {
+        } elseif ($candidate === '' && isset($_SERVER['OPENROUTER_API_KEY'])) {
             $candidate = (string)$_SERVER['OPENROUTER_API_KEY'];
-        } elseif (isset($_ENV['OPENROUTER_API_KEY'])) {
+        } elseif ($candidate === '' && isset($_ENV['OPENROUTER_API_KEY'])) {
             $candidate = (string)$_ENV['OPENROUTER_API_KEY'];
-        } else {
+        } elseif ($candidate === '') {
             $fileCandidates = [
                 __DIR__ . '/.openrouter.key',
                 dirname(__DIR__) . '/.openrouter.key',

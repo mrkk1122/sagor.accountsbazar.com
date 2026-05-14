@@ -39,3 +39,12 @@ setx OPENROUTER_API_KEY "YOUR_OPENROUTER_API_KEY" /M
 ```
 
 Then restart Apache.
+
+### Method C: Local secret file (shared hosting friendly)
+
+1. Copy `includes/secret.local.example.php` to `includes/secret.local.php`.
+2. Edit `includes/secret.local.php` and set your real OpenRouter key.
+3. Keep this file private (it is git-ignored and includes path is blocked in `.htaccess`).
+4. Open `/health-check.php` to verify:
+	- `openrouter_key_loaded: true`
+	- `openrouter_key_format_valid: true`
