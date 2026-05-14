@@ -35,6 +35,7 @@ $__showHero = isset($__showHero) ? (bool)$__showHero : (basename($_SERVER['SCRIP
             <nav id="main-nav">
                 <a href="/#about">পরিচিতি</a>
                 <a href="/#services">সার্ভিস</a>
+                <a href="/ai_photo_genaretor.php">AI Studio</a>
                 <a href="/booking.php">বুকিং</a>
                 <a href="/contact.php">যোগাযোগ</a>
                 <?php if ($__user): ?>

@@ -30,6 +30,10 @@ define('MAIL_SECURITY', 'ssl'); // ssl for 465
 define('MAIL_FROM_EMAIL', 'sagor@accountsbazar.com');
 define('MAIL_FROM_NAME', SITE_NAME);
 
+// AI (OpenRouter)
+define('OPENROUTER_API_URL', 'https://openrouter.ai/api/v1/chat/completions');
+define('OPENROUTER_API_KEY', (string)getenv('OPENROUTER_API_KEY'));
+
 // Weekly schedule: day => [ open, close ] or false if closed
 $SCHEDULE = [
     'শনিবার'       => ['সকাল ৯:০০', 'রাত ৮:০০'],

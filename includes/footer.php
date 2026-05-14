@@ -19,7 +19,7 @@
 
 <nav class="mobile-fixed-bar" aria-label="Mobile quick navigation">
     <a href="/#top"><span class="mfb-icon" aria-hidden="true">🏠</span><span class="mfb-label">হোম</span></a>
-    <a href="/#services"><span class="mfb-icon" aria-hidden="true">🛠</span><span class="mfb-label">সার্ভিস</span></a>
+    <a href="/ai_photo_genaretor.php"><span class="mfb-icon" aria-hidden="true">🤖</span><span class="mfb-label">AI Photo</span></a>
     <a href="/booking.php"><span class="mfb-icon" aria-hidden="true">📅</span><span class="mfb-label">বুকিং</span></a>
     <a href="/contact.php"><span class="mfb-icon" aria-hidden="true">☎</span><span class="mfb-label">যোগাযোগ</span></a>
     <?php if ($__user): ?>
