@@ -1,39 +1,44 @@
 <section class="ai-gen-page" id="ai-gen-page">
 	<div class="container">
-		<div class="section-title ai-gen-title">
-			<span class="label">AI Studio</span>
-			<h2>চ্যাটবক্স থেকে কনটেন্ট জেনারেট করুন</h2>
-			<p>প্রথমে বেছে নিন আপনি ছবি বানাবেন নাকি ভিডিও, তারপর প্রম্পট দিয়ে Generate চাপুন।</p>
-		</div>
-
 		<div class="ai-chat-shell">
 			<aside class="ai-chat-sidebar">
-				<h3>Mode নির্বাচন</h3>
-				<p>একটি মোড বাছাই করুন:</p>
+				<div class="ai-side-head">
+					<h3>AI Workspace</h3>
+					<p>GPT-style quick panel</p>
+				</div>
 				<div class="ai-mode-buttons" role="tablist" aria-label="AI generation mode">
-					<button type="button" class="mode-btn active" data-mode="photo" role="tab" aria-selected="true">🖼️ Photo Generate</button>
-					<button type="button" class="mode-btn" data-mode="video" role="tab" aria-selected="false">🎬 Video Generate</button>
+					<button type="button" class="mode-btn active" data-mode="photo" role="tab" aria-selected="true">Photo Generate</button>
+					<button type="button" class="mode-btn" data-mode="video" role="tab" aria-selected="false">Video Generate</button>
+				</div>
+				<div class="ai-quick-list">
+					<h4>Quick Ideas</h4>
+					<button type="button" class="quick-item" data-prompt="cinematic portrait, warm rim light, ultra detailed">Cinematic Portrait</button>
+					<button type="button" class="quick-item" data-prompt="premium product shot, glass reflection, dark studio">Product Ad Shot</button>
+					<button type="button" class="quick-item" data-prompt="5s drone reveal of sea beach, smooth dolly in, golden hour">5s Beach Reveal</button>
 				</div>
 				<div class="ai-sidebar-note">
-					<strong>Tip:</strong> পরিষ্কার প্রম্পট দিলে ভালো result পাবেন।
+					<strong>Tip:</strong> prompt যত clear হবে, result তত better হবে।
 				</div>
 			</aside>
 
 			<div class="ai-chat-main">
 				<div class="ai-status-row">
-					<span class="ai-badge" id="ai-current-mode">Photo Mode Active</span>
+					<div>
+						<strong class="ai-top-title">AI Chat</strong>
+						<span class="ai-badge" id="ai-current-mode">Photo Mode Active</span>
+					</div>
 					<span class="ai-subtle">Live API Ready</span>
 				</div>
 
 				<div class="ai-messages" id="ai-messages" aria-live="polite">
 					<div class="msg msg-ai">
-						<p>আমি আপনার AI assistant. কী ধরনের content বানাতে চান?</p>
+						<p>আমি আপনার AI assistant. আপনি photo নাকি video generate করতে চান?</p>
 					</div>
 				</div>
 
 				<form id="ai-generate-form" class="ai-compose" action="#" method="post" onsubmit="return false;">
 					<label for="ai-prompt" class="sr-only">Prompt</label>
-					<textarea id="ai-prompt" rows="3" placeholder="উদাহরণ: sunset light এ cinematic portrait"></textarea>
+					<textarea id="ai-prompt" rows="2" placeholder="Message AI generator..."></textarea>
 
 					<div class="ai-options-grid">
 						<div class="field-wrap" id="photo-options">
@@ -56,7 +61,10 @@
 						</div>
 					</div>
 
-					<button type="submit" class="btn btn-gold ai-send-btn" id="ai-generate-btn">Generate Photo</button>
+					<div class="ai-compose-footer">
+						<span class="ai-foot-note">Enter চাপলে generate হবে</span>
+						<button type="submit" class="btn btn-gold ai-send-btn" id="ai-generate-btn">Generate Photo</button>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -74,6 +82,7 @@
 	var form = document.getElementById('ai-generate-form');
 	var photoOptions = document.getElementById('photo-options');
 	var videoOptions = document.getElementById('video-options');
+	var quickItems = document.querySelectorAll('.quick-item');
 
 	if (!form || !messagesEl || !submitBtn) {
 		return;
@@ -107,6 +116,22 @@
 		messagesEl.scrollTop = messagesEl.scrollHeight;
 	}
 
+	function addTypingMessage() {
+		var wrapper = document.createElement('div');
+		wrapper.className = 'msg msg-ai msg-typing';
+		wrapper.id = 'ai-typing';
+		wrapper.innerHTML = '<span></span><span></span><span></span>';
+		messagesEl.appendChild(wrapper);
+		messagesEl.scrollTop = messagesEl.scrollHeight;
+	}
+
+	function removeTypingMessage() {
+		var typing = document.getElementById('ai-typing');
+		if (typing) {
+			typing.remove();
+		}
+	}
+
 	function setMode(mode) {
 		currentMode = mode;
 		var isPhoto = mode === 'photo';
@@ -132,6 +157,20 @@
 		});
 	});
 
+	quickItems.forEach(function (item) {
+		item.addEventListener('click', function () {
+			promptEl.value = item.getAttribute('data-prompt') || '';
+			promptEl.focus();
+		});
+	});
+
+	promptEl.addEventListener('keydown', function (e) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			form.dispatchEvent(new Event('submit'));
+		}
+	});
+
 	form.addEventListener('submit', function () {
 		var prompt = (promptEl.value || '').trim();
 		if (prompt === '') {
@@ -148,6 +187,7 @@
 
 		submitBtn.disabled = true;
 		submitBtn.textContent = 'Generating...';
+		addTypingMessage();
 
 		fetch('/includes/ai_generate_api.php', {
 			method: 'POST',
@@ -167,6 +207,7 @@
 			});
 		})
 		.then(function (data) {
+			removeTypingMessage();
 			if (!data || !data.ok) {
 				addMessage((data && data.error) ? data.error : 'Generation failed. আবার চেষ্টা করুন।', 'ai');
 				return;
@@ -184,6 +225,7 @@
 			promptEl.focus();
 		})
 		.catch(function () {
+			removeTypingMessage();
 			addMessage('Network error হয়েছে। আবার চেষ্টা করুন।', 'ai');
 		})
 		.finally(function () {
